@@ -23,29 +23,39 @@ export async function POST(req: NextRequest) {
   const link = await prisma.claimableLink.findUnique({ where: { code } });
 
   if (!link) return NextResponse.json({ error: "Link not found" }, { status: 404 });
-  if (link.status !== "UNCLAIMED") {
-    return NextResponse.json({ error: "Link already claimed or cancelled" }, { status: 400 });
-  }
   if (link.expiresAt && link.expiresAt < new Date()) {
     return NextResponse.json({ error: "Link has expired" }, { status: 400 });
   }
-
   if (!link.escrowWalletId) {
     return NextResponse.json({ error: "Escrow wallet not found" }, { status: 500 });
   }
 
-  // Transfer from escrow to recipient
-  await transferUsdc({
-    sourceWalletId: link.escrowWalletId,
-    destinationAddress: toAddress,
-    amountUsdc: link.amountUsdc,
-  });
-
-  // Mark as claimed
-  await prisma.claimableLink.update({
-    where: { code },
+  // Atomically mark as CLAIMED before transferring — prevents race condition double-spend
+  const claimed = await prisma.claimableLink.updateMany({
+    where: { code, status: "UNCLAIMED" },
     data: { status: "CLAIMED", claimedBy: toAddress, claimedAt: new Date() },
   });
+
+  if (claimed.count === 0) {
+    return NextResponse.json({ error: "Link already claimed or cancelled" }, { status: 400 });
+  }
+
+  // Transfer from escrow to recipient (after atomic claim)
+  try {
+    await transferUsdc({
+      sourceWalletId: link.escrowWalletId,
+      destinationAddress: toAddress,
+      amountUsdc: link.amountUsdc,
+    });
+  } catch (e: unknown) {
+    // Revert claim status so user can retry
+    await prisma.claimableLink.update({
+      where: { code },
+      data: { status: "UNCLAIMED", claimedBy: null, claimedAt: null },
+    });
+    const msg = (e as { response?: { data?: { message?: string } }; message?: string })?.response?.data?.message ?? (e as Error)?.message ?? "Transfer failed";
+    return NextResponse.json({ error: msg }, { status: 500 });
+  }
 
   return NextResponse.json({ ok: true, amountUsdc: link.amountUsdc });
 }

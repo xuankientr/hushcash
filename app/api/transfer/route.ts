@@ -71,5 +71,5 @@ export async function POST(req: NextRequest) {
     })] : []),
   ]);
 
-  return NextResponse.json({ transfer });
+  return NextResponse.json({ transfer: { id: transfer.id, amountUsdc: transfer.amountUsdc, status: transfer.status } });
 }
