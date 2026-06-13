@@ -11,8 +11,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: 'HushCash',
-  description:
-    'Send. Claim. Own. Privately.',
+  description: 'Send. Claim. Own. Privately.',
+  icons: { icon: '/logo.png', apple: '/logo.png' },
   openGraph: {
     title: 'HushCash',
     description: 'Private payments on Arc.',
