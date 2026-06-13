@@ -1,0 +1,124 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Auth
+  privyDid      String?  @unique
+  twitterId     String?  @unique
+  twitterHandle String?  @unique
+  twitterName   String?
+  twitterAvatar String?
+  email         String?  @unique
+
+  // Circle wallet
+  walletId      String?  @unique
+  walletAddress String?  @unique
+
+  // Relations
+  sentTransfers     Transfer[]       @relation("SentTransfers")
+  receivedTransfers Transfer[]       @relation("ReceivedTransfers")
+  paymentRequests   PaymentRequest[]
+  claimableLinks    ClaimableLink[]
+
+  @@map("users")
+}
+
+model Transfer {
+  id          String         @id @default(cuid())
+  createdAt   DateTime       @default(now())
+
+  senderId    String
+  receiverId  String?
+  sender      User           @relation("SentTransfers", fields: [senderId], references: [id])
+  receiver    User?          @relation("ReceivedTransfers", fields: [receiverId], references: [id])
+
+  // Can send to external wallet too
+  toAddress   String?
+
+  amountUsdc  String         // stored as string to avoid float issues
+  note        String?
+  status      TransferStatus @default(PENDING)
+
+  // Circle transfer id
+  circleTransferId String?
+  txHash           String?
+
+  @@map("transfers")
+}
+
+model PaymentRequest {
+  id          String              @id @default(cuid())
+  createdAt   DateTime            @default(now())
+  expiresAt   DateTime?
+
+  userId      String
+  user        User                @relation(fields: [userId], references: [id])
+
+  code        String              @unique @default(cuid())
+  amountUsdc  String?             // null = any amount
+  note        String?
+  status      PaymentRequestStatus @default(ACTIVE)
+
+  @@map("payment_requests")
+}
+
+model ClaimableLink {
+  id          String            @id @default(cuid())
+  createdAt   DateTime          @default(now())
+  expiresAt   DateTime?
+
+  senderId    String
+  sender      User              @relation(fields: [senderId], references: [id])
+
+  code        String            @unique
+  amountUsdc  String
+  note        String?
+  status      ClaimableLinkStatus @default(UNCLAIMED)
+
+  // Who claimed it
+  claimedBy   String?           // wallet address or user id
+  claimedAt   DateTime?
+
+  // Circle escrow wallet holding the funds
+  escrowWalletId String?
+
+  @@map("claimable_links")
+}
+
+enum TransferStatus {
+  PENDING
+  COMPLETE
+  FAILED
+}
+
+enum PaymentRequestStatus {
+  ACTIVE
+  PAID
+  CANCELLED
+  EXPIRED
+}
+
+enum ClaimableLinkStatus {
+  UNCLAIMED
+  CLAIMED
+  CANCELLED
+  EXPIRED
+}
+
+model Waitlist {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  email     String   @unique
+
+  @@map("waitlist")
+}
