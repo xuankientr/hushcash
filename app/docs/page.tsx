@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 const cards = [
   {
     icon: '',
@@ -38,6 +40,33 @@ export default function DocsPage() {
           HushCash is a private payments app built on Arc.
         </p>
       </div>
+
+      {/* HushCash Pay — featured */}
+      <Link
+        href='/docs/pay'
+        className='group block p-5 rounded-2xl border border-primary/30 bg-primary/[0.06] hover:bg-primary/[0.10] hover:border-primary/50 transition-all'
+      >
+        <div className='flex items-start justify-between gap-4'>
+          <div className='space-y-1.5'>
+            <div className='flex items-center gap-2'>
+              <span className='text-sm'></span>
+              <p className='text-[13px] font-semibold text-white'>
+                HushCash Pay
+              </p>
+              <span className='text-[10px] px-1.5 py-0.5 rounded-full bg-white/[0.07] text-white-4 font-medium'>
+                sandbox
+              </span>
+            </div>
+            <p className='text-[12px] text-white-3 leading-relaxed max-w-sm'>
+              Accept USDC payments directly — merchants, freelancers, and
+              businesses. Scan a QR or enter an address. Prices shown in VND.
+            </p>
+          </div>
+          <span className='text-white-4 group-hover:text-white transition-colors text-sm flex-shrink-0 mt-0.5'>
+            →
+          </span>
+        </div>
+      </Link>
 
       {/* Cards */}
       <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
@@ -110,7 +139,6 @@ export default function DocsPage() {
           ))}
         </ol>
       </div>
-
     </div>
   );
 }

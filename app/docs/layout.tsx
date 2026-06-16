@@ -16,6 +16,7 @@ const nav = [
       { label: 'Request', href: '/docs/request' },
       { label: 'Drop Cash', href: '/docs/drop' },
       { label: 'Wallet', href: '/docs/wallet' },
+      { label: 'HushCash Pay', href: '/docs/pay' },
     ],
   },
   {
@@ -54,7 +55,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
               <ul className="space-y-0.5">
                 {items.map(({ label, href }) => (
                   <li key={href}>
-                    {href === '/docs' ? (
+                    {href === '/docs' || href === '/docs/pay' ? (
                       <Link
                         href={href}
                         className="block px-2 py-1.5 text-[13px] text-white-3 hover:text-white rounded-lg hover:bg-white/[0.05] transition-colors"
