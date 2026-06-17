@@ -24,8 +24,11 @@ Users can send USDC by X (Twitter) handle, wallet address, or shareable link —
 | Contract | Network | Address |
 |----------|---------|---------|
 | DropCashEscrow | Arc Testnet | [`0x395F664bd86945074eE8145c947bc3A2887E4F7F`](https://testnet.arcscan.app/address/0x395F664bd86945074eE8145c947bc3A2887E4F7F) |
+| PrivacyRouter *(coming soon)* | Arc Testnet | Pending ArcaneVM availability |
 
 Contract source: [`contracts/contracts/DropCashEscrow.sol`](contracts/contracts/DropCashEscrow.sol)
+
+> Once ArcaneVM is live on Arc Testnet, HushCash will deploy a confidential payment router that processes transfers inside a hardware-secured enclave — making transaction data cryptographically private at the protocol level.
 
 ## Tech Stack
 
