@@ -114,15 +114,73 @@ export default function HushCashPayPage() {
         </div>
       </div>
 
+      {/* Payment memos */}
+      <div className="space-y-3">
+        <h2 className="text-base font-semibold text-white">Payment memos</h2>
+        <p className="text-sm text-white-3 leading-relaxed">
+          Arc&apos;s transaction memo system lets you attach structured context directly to a payment — invoice numbers, reference codes, categories, or notes. The memo is recorded on-chain alongside the transfer and can be indexed for reconciliation, reporting, or accounting.
+        </p>
+        <div className="space-y-2">
+          {[
+            { label: 'Invoice / reference', desc: 'Attach your invoice ID or PO number so the payment is traceable without manual matching.' },
+            { label: 'Category tag', desc: 'Label payments by type — services, rent, goods — for automated bookkeeping.' },
+            { label: 'Note or message', desc: 'Add a short note visible only to sender and recipient.' },
+          ].map(({ label, desc }) => (
+            <div key={label} className="flex gap-3 px-4 py-3 rounded-xl border border-white/[0.07] bg-white/[0.02]">
+              <p className="text-[12px] font-semibold text-white w-36 flex-shrink-0">{label}</p>
+              <p className="text-[12px] text-white-4 leading-relaxed">{desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Selective disclosure */}
+      <div className="space-y-3">
+        <h2 className="text-base font-semibold text-white">Selective disclosure</h2>
+        <p className="text-sm text-white-3 leading-relaxed">
+          Not every field in a transaction needs to be equally visible. HushCash lets you choose disclosure per memo field — publish what helps, protect what doesn&apos;t.
+        </p>
+        <div className="space-y-2.5">
+          <div className="p-4 rounded-2xl border border-white/[0.07] bg-white/[0.02] space-y-3">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="w-2 h-2 rounded-full bg-emerald-400/70 flex-shrink-0" />
+              <p className="text-[12px] font-semibold text-white">Public fields</p>
+            </div>
+            <p className="text-[12px] text-white-4 leading-relaxed">
+              Visible on-chain to anyone — useful for audits, reconciliation, and third-party verification. Typical choices: amount, date, category, invoice reference.
+            </p>
+          </div>
+          <div className="p-4 rounded-2xl border border-white/[0.07] bg-white/[0.02] space-y-3">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="w-2 h-2 rounded-full bg-white/30 flex-shrink-0" />
+              <p className="text-[12px] font-semibold text-white">Private fields</p>
+            </div>
+            <p className="text-[12px] text-white-4 leading-relaxed">
+              Encrypted and accessible only to sender and recipient. Typical choices: personal notes, customer identity, internal references. Cryptographic enforcement via ArcaneVM — coming soon.
+            </p>
+          </div>
+          <div className="p-4 rounded-2xl border border-primary/20 bg-primary/[0.04] space-y-1">
+            <p className="text-[12px] font-semibold text-white">Fully transparent mode</p>
+            <p className="text-[12px] text-white-4 leading-relaxed">
+              For use cases that require full auditability — corporate treasury, regulated payments, or public grant disbursements — you can mark all memo fields public. Every detail is on-chain and verifiable.
+            </p>
+          </div>
+        </div>
+        <p className="text-[12px] text-white-4 leading-relaxed">
+          The goal is flexibility: a freelancer might publish their invoice reference but keep the client&apos;s name private; a coffee shop might share category and amount for accounting but hide the customer note. Selective disclosure means you decide what the world sees.
+        </p>
+      </div>
+
       {/* Use cases */}
       <div className="space-y-3">
         <h2 className="text-base font-semibold text-white">Use cases</h2>
         <ul className="space-y-1.5">
           {[
-            'Coffee shops and restaurants — print QR at the counter.',
-            'Freelancers — send a pay link on invoices.',
-            'Online stores — embed a payment QR in order confirmation emails.',
-            'Cross-border payments — receive USD-equivalent without a foreign bank account.',
+            'Coffee shops and restaurants — print QR at the counter; attach category tags for daily reconciliation.',
+            'Freelancers — send a pay link on invoices with the invoice number embedded as a public memo.',
+            'Online stores — embed a payment QR in order confirmation emails; reference order IDs on-chain.',
+            'Cross-border payments — receive USD-equivalent without a foreign bank account; keep recipient identity private.',
+            'Corporate payroll or grants — publish amount and category for auditors while keeping personal details off-chain.',
           ].map((item) => (
             <li key={item} className="flex gap-2.5 text-sm text-white-3">
               <span className="text-white-4 flex-shrink-0">—</span>

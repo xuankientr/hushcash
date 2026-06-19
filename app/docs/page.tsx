@@ -93,6 +93,8 @@ export default function DocsPage() {
             'Pay by X handle, wallet address, or shareable link.',
             'Native USDC on Arc — fast finality, near-zero fees.',
             'Non-custodial wallets powered by Circle.',
+            'Transaction memos — attach invoice refs, notes, or categories to any payment.',
+            'Selective disclosure — choose which memo fields are public or private per transaction.',
             'On-chain privacy via ArcaneVM — coming soon.',
           ].map((item) => (
             <li
