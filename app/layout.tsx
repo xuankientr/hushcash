@@ -10,13 +10,29 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://hushcash.xyz'),
   title: 'HushCash',
   description: 'Send. Claim. Own. Privately.',
   icons: { icon: '/logo.png', apple: '/logo.png' },
   openGraph: {
     title: 'HushCash',
     description: 'Private payments on Arc.',
-    images: ['/og.png'],
+    url: 'https://hushcash.xyz',
+    siteName: 'HushCash',
+    images: [
+      {
+        url: '/earlyaccess.png',
+        width: 1200,
+        height: 630,
+      },
+    ],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'HushCash',
+    description: 'Private payments on Arc.',
+    images: ['/earlyaccess.png'],
   },
 };
 
