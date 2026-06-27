@@ -50,29 +50,29 @@ export default function HushCashPayPage() {
   return (
     <div className="space-y-10">
       <div className="space-y-3">
-        <p className="text-xs font-semibold uppercase tracking-widest text-white-4">Features</p>
-        <h1 className="text-2xl font-bold text-white">HushCash Pay</h1>
-        <p className="text-sm text-white-3 leading-relaxed max-w-lg">
+        <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">Features</p>
+        <h1 className="text-2xl font-bold text-gray-900">HushCash Pay</h1>
+        <p className="text-sm text-gray-600 leading-relaxed max-w-lg">
           A merchant payment solution built on USDC. Accept payments directly — no card terminals, no bank accounts, no intermediaries.
         </p>
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-white/[0.10] bg-white/[0.04]">
-          <span className="w-1.5 h-1.5 rounded-full bg-yellow-400/70" />
-          <span className="text-[11px] text-white-3">Coming soon</span>
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-gray-200 bg-gray-50">
+          <span className="w-1.5 h-1.5 rounded-full bg-yellow-400" />
+          <span className="text-[11px] text-gray-500">Coming soon</span>
         </div>
       </div>
 
       {/* How it works */}
       <div className="space-y-3">
-        <h2 className="text-base font-semibold text-white">How it works</h2>
+        <h2 className="text-base font-semibold text-gray-900">How it works</h2>
         <div className="space-y-2.5">
           {steps.map(({ step, title, body }) => (
-            <div key={step} className="flex gap-4 p-4 rounded-2xl border border-white/[0.07] bg-white/[0.02]">
-              <span className="w-6 h-6 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-[11px] font-bold text-primary flex-shrink-0 mt-0.5">
+            <div key={step} className="flex gap-4 p-4 rounded-2xl border border-gray-200 bg-gray-50">
+              <span className="w-6 h-6 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-[11px] font-bold text-primary flex-shrink-0 mt-0.5">
                 {step}
               </span>
               <div>
-                <p className="text-[13px] font-semibold text-white">{title}</p>
-                <p className="text-[12px] text-white-4 mt-1 leading-relaxed">{body}</p>
+                <p className="text-[13px] font-semibold text-gray-800">{title}</p>
+                <p className="text-[12px] text-gray-500 mt-1 leading-relaxed">{body}</p>
               </div>
             </div>
           ))}
@@ -81,20 +81,20 @@ export default function HushCashPayPage() {
 
       {/* USDC → VND */}
       <div className="space-y-3">
-        <h2 className="text-base font-semibold text-white">USDC / VND</h2>
-        <p className="text-sm text-white-3 leading-relaxed">
+        <h2 className="text-base font-semibold text-gray-900">USDC / VND</h2>
+        <p className="text-sm text-gray-600 leading-relaxed">
           HushCash Pay displays live USDC ↔ VND rates on the payment screen. Merchants set prices in VND — HushCash calculates the exact USDC amount the customer needs to send. The rate is fetched in real time so both parties always see the current value.
         </p>
-        <div className="p-4 rounded-2xl border border-white/[0.07] bg-white/[0.02] space-y-2">
-          <p className="text-[12px] text-white-4 leading-relaxed">Example:</p>
+        <div className="p-4 rounded-2xl border border-gray-200 bg-gray-50 space-y-2">
+          <p className="text-[12px] text-gray-400 leading-relaxed">Example:</p>
           <div className="flex items-center gap-3">
-            <div className="flex-1 px-3 py-2.5 rounded-xl bg-black/30 border border-white/[0.06]">
-              <p className="text-[11px] text-white-4 mb-0.5">Merchant sets</p>
-              <p className="text-sm font-semibold text-white">500,000 VND</p>
+            <div className="flex-1 px-3 py-2.5 rounded-xl bg-white border border-gray-200">
+              <p className="text-[11px] text-gray-400 mb-0.5">Merchant sets</p>
+              <p className="text-sm font-semibold text-gray-800">500,000 VND</p>
             </div>
-            <span className="text-white-4 text-sm">→</span>
-            <div className="flex-1 px-3 py-2.5 rounded-xl bg-black/30 border border-white/[0.06]">
-              <p className="text-[11px] text-white-4 mb-0.5">Customer pays</p>
+            <span className="text-gray-400 text-sm">→</span>
+            <div className="flex-1 px-3 py-2.5 rounded-xl bg-white border border-gray-200">
+              <p className="text-[11px] text-gray-400 mb-0.5">Customer pays</p>
               <p className="text-sm font-semibold text-primary">~20.00 USDC</p>
             </div>
           </div>
@@ -103,12 +103,12 @@ export default function HushCashPayPage() {
 
       {/* Benefits */}
       <div className="space-y-3">
-        <h2 className="text-base font-semibold text-white">Why HushCash Pay</h2>
+        <h2 className="text-base font-semibold text-gray-900">Why HushCash Pay</h2>
         <div className="space-y-2">
           {benefits.map(({ title, desc }) => (
-            <div key={title} className="flex gap-3 px-4 py-3 rounded-xl border border-white/[0.07] bg-white/[0.02]">
-              <p className="text-[12px] font-semibold text-white w-32 flex-shrink-0">{title}</p>
-              <p className="text-[12px] text-white-4 leading-relaxed">{desc}</p>
+            <div key={title} className="flex gap-3 px-4 py-3 rounded-xl border border-gray-200 bg-gray-50">
+              <p className="text-[12px] font-semibold text-gray-800 w-32 flex-shrink-0">{title}</p>
+              <p className="text-[12px] text-gray-500 leading-relaxed">{desc}</p>
             </div>
           ))}
         </div>
@@ -116,8 +116,8 @@ export default function HushCashPayPage() {
 
       {/* Payment memos */}
       <div className="space-y-3">
-        <h2 className="text-base font-semibold text-white">Payment memos</h2>
-        <p className="text-sm text-white-3 leading-relaxed">
+        <h2 className="text-base font-semibold text-gray-900">Payment memos</h2>
+        <p className="text-sm text-gray-600 leading-relaxed">
           Arc&apos;s transaction memo system lets you attach structured context directly to a payment — invoice numbers, reference codes, categories, or notes. The memo is recorded on-chain alongside the transfer and can be indexed for reconciliation, reporting, or accounting.
         </p>
         <div className="space-y-2">
@@ -126,9 +126,9 @@ export default function HushCashPayPage() {
             { label: 'Category tag', desc: 'Label payments by type — services, rent, goods — for automated bookkeeping.' },
             { label: 'Note or message', desc: 'Add a short note visible only to sender and recipient.' },
           ].map(({ label, desc }) => (
-            <div key={label} className="flex gap-3 px-4 py-3 rounded-xl border border-white/[0.07] bg-white/[0.02]">
-              <p className="text-[12px] font-semibold text-white w-36 flex-shrink-0">{label}</p>
-              <p className="text-[12px] text-white-4 leading-relaxed">{desc}</p>
+            <div key={label} className="flex gap-3 px-4 py-3 rounded-xl border border-gray-200 bg-gray-50">
+              <p className="text-[12px] font-semibold text-gray-800 w-36 flex-shrink-0">{label}</p>
+              <p className="text-[12px] text-gray-500 leading-relaxed">{desc}</p>
             </div>
           ))}
         </div>
@@ -136,44 +136,44 @@ export default function HushCashPayPage() {
 
       {/* Selective disclosure */}
       <div className="space-y-3">
-        <h2 className="text-base font-semibold text-white">Selective disclosure</h2>
-        <p className="text-sm text-white-3 leading-relaxed">
+        <h2 className="text-base font-semibold text-gray-900">Selective disclosure</h2>
+        <p className="text-sm text-gray-600 leading-relaxed">
           Not every field in a transaction needs to be equally visible. HushCash lets you choose disclosure per memo field — publish what helps, protect what doesn&apos;t.
         </p>
         <div className="space-y-2.5">
-          <div className="p-4 rounded-2xl border border-white/[0.07] bg-white/[0.02] space-y-3">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="w-2 h-2 rounded-full bg-emerald-400/70 flex-shrink-0" />
-              <p className="text-[12px] font-semibold text-white">Public fields</p>
+          <div className="p-4 rounded-2xl border border-gray-200 bg-gray-50 space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0" />
+              <p className="text-[12px] font-semibold text-gray-800">Public fields</p>
             </div>
-            <p className="text-[12px] text-white-4 leading-relaxed">
+            <p className="text-[12px] text-gray-500 leading-relaxed">
               Visible on-chain to anyone — useful for audits, reconciliation, and third-party verification. Typical choices: amount, date, category, invoice reference.
             </p>
           </div>
-          <div className="p-4 rounded-2xl border border-white/[0.07] bg-white/[0.02] space-y-3">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="w-2 h-2 rounded-full bg-white/30 flex-shrink-0" />
-              <p className="text-[12px] font-semibold text-white">Private fields</p>
+          <div className="p-4 rounded-2xl border border-gray-200 bg-gray-50 space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-gray-300 flex-shrink-0" />
+              <p className="text-[12px] font-semibold text-gray-800">Private fields</p>
             </div>
-            <p className="text-[12px] text-white-4 leading-relaxed">
+            <p className="text-[12px] text-gray-500 leading-relaxed">
               Encrypted and accessible only to sender and recipient. Typical choices: personal notes, customer identity, internal references. Cryptographic enforcement via ArcaneVM — coming soon.
             </p>
           </div>
-          <div className="p-4 rounded-2xl border border-primary/20 bg-primary/[0.04] space-y-1">
-            <p className="text-[12px] font-semibold text-white">Fully transparent mode</p>
-            <p className="text-[12px] text-white-4 leading-relaxed">
+          <div className="p-4 rounded-2xl border border-primary/20 bg-blue-50 space-y-1">
+            <p className="text-[12px] font-semibold text-gray-800">Fully transparent mode</p>
+            <p className="text-[12px] text-gray-500 leading-relaxed">
               For use cases that require full auditability — corporate treasury, regulated payments, or public grant disbursements — you can mark all memo fields public. Every detail is on-chain and verifiable.
             </p>
           </div>
         </div>
-        <p className="text-[12px] text-white-4 leading-relaxed">
+        <p className="text-[12px] text-gray-500 leading-relaxed">
           The goal is flexibility: a freelancer might publish their invoice reference but keep the client&apos;s name private; a coffee shop might share category and amount for accounting but hide the customer note. Selective disclosure means you decide what the world sees.
         </p>
       </div>
 
       {/* Use cases */}
       <div className="space-y-3">
-        <h2 className="text-base font-semibold text-white">Use cases</h2>
+        <h2 className="text-base font-semibold text-gray-900">Use cases</h2>
         <ul className="space-y-1.5">
           {[
             'Coffee shops and restaurants — print QR at the counter; attach category tags for daily reconciliation.',
@@ -182,16 +182,16 @@ export default function HushCashPayPage() {
             'Cross-border payments — receive USD-equivalent without a foreign bank account; keep recipient identity private.',
             'Corporate payroll or grants — publish amount and category for auditors while keeping personal details off-chain.',
           ].map((item) => (
-            <li key={item} className="flex gap-2.5 text-sm text-white-3">
-              <span className="text-white-4 flex-shrink-0">—</span>
+            <li key={item} className="flex gap-2.5 text-sm text-gray-600">
+              <span className="text-gray-300 flex-shrink-0">—</span>
               {item}
             </li>
           ))}
         </ul>
       </div>
 
-      <div className="pt-2 border-t border-white/[0.06] flex justify-start">
-        <Link href="/docs" className="flex items-center gap-1.5 text-[13px] text-white-3 hover:text-white transition-colors">
+      <div className="pt-2 border-t border-gray-200 flex justify-start">
+        <Link href="/docs" className="flex items-center gap-1.5 text-[13px] text-gray-500 hover:text-gray-800 transition-colors">
           <span>←</span> Introduction
         </Link>
       </div>
