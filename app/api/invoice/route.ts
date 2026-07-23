@@ -8,7 +8,7 @@ const schema = z.object({
   description: z.string().max(1000).optional(),
   amountUsdc: z.string().regex(/^\d+(\.\d{1,6})?$/),
   proofNote: z.string().max(1000).optional(),
-  proofImageUrl: z.string().url().optional().or(z.literal("")),
+  proofImageUrl: z.string().max(600_000).optional().or(z.literal("")),
 });
 
 export async function POST(req: NextRequest) {
