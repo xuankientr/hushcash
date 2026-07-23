@@ -56,9 +56,9 @@ export default function LoginPage() {
       <div className='absolute bottom-6 left-0 right-0 flex items-center justify-center gap-4'>
         {[
           { label: 'X', href: 'https://x.com/hushcash_xyz' },
-          { label: 'Docs', href: '#' },
-          { label: 'Privacy', href: '#' },
-          { label: 'Terms', href: '#' },
+          { label: 'Docs', href: '/docs' },
+          { label: 'Privacy', href: '/privacy' },
+          { label: 'Terms', href: '/terms' },
         ].map(({ label, href }) => (
           <a
             key={label}

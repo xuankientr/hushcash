@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { transferUsdc } from "@/lib/circle";
 import { isValidAddress } from "@/lib/utils";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { z } from "zod";
 
 const schema = z.object({
@@ -18,6 +19,11 @@ export async function POST(req: NextRequest) {
 
   if (!isValidAddress(toAddress)) {
     return NextResponse.json({ error: "Invalid wallet address" }, { status: 400 });
+  }
+
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  if (!checkRateLimit(`claim:${ip}`, 20, 60_000).ok) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 
   const link = await prisma.claimableLink.findUnique({ where: { code } });

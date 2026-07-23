@@ -3,6 +3,7 @@ import { getAuthUser } from "@/lib/privy-server";
 import { prisma } from "@/lib/prisma";
 import { transferUsdc } from "@/lib/circle";
 import { isValidAddress, isTwitterHandle, normalizeHandle } from "@/lib/utils";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { z } from "zod";
 
 const schema = z.object({
@@ -15,6 +16,10 @@ const schema = z.object({
 export async function POST(req: NextRequest) {
   const user = await getAuthUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  if (!checkRateLimit(`transfer:${user.id}`, 10, 60_000).ok) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
 
   const body = await req.json();
   const parsed = schema.safeParse(body);
