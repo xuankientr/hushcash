@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { BalanceCard } from "./BalanceCard";
 import { TransactionList } from "./TransactionList";
 import { SendModal } from "./SendModal";
@@ -22,6 +23,7 @@ export function DashboardClient({
   transfers: Transfer[];
 }) {
   const [modal, setModal] = useState<Modal>(null);
+  const router = useRouter();
 
   return (
     <>
@@ -54,6 +56,12 @@ export function DashboardClient({
             className="flex-1 h-12 rounded-2xl border border-white/[0.12] text-white text-sm font-semibold hover:bg-white/[0.05] transition-all active:scale-[0.97]"
           >
             Request
+          </button>
+          <button
+            onClick={() => router.push("/invoice/new")}
+            className="flex-1 h-12 rounded-2xl border border-white/[0.12] text-white text-sm font-semibold hover:bg-white/[0.05] transition-all active:scale-[0.97]"
+          >
+            Invoice
           </button>
         </div>
 

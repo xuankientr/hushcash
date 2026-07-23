@@ -33,6 +33,7 @@ model User {
   receivedTransfers Transfer[]       @relation("ReceivedTransfers")
   paymentRequests   PaymentRequest[]
   claimableLinks    ClaimableLink[]
+  invoices          Invoice[]
 
   @@map("users")
 }
@@ -117,6 +118,35 @@ enum ClaimableLinkStatus {
   CLAIMED
   CANCELLED
   EXPIRED
+}
+
+model Invoice {
+  id          String        @id @default(cuid())
+  createdAt   DateTime      @default(now())
+
+  creatorId   String
+  creator     User          @relation(fields: [creatorId], references: [id])
+
+  code        String        @unique @default(cuid())
+
+  title       String
+  description String?
+  amountUsdc  String
+
+  // Proof of work
+  proofNote     String?
+  proofImageUrl String?
+
+  status      InvoiceStatus @default(PENDING)
+  paidAt      DateTime?
+
+  @@map("invoices")
+}
+
+enum InvoiceStatus {
+  PENDING
+  PAID
+  CANCELLED
 }
 
 model Waitlist {
