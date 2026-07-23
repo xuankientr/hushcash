@@ -53,14 +53,14 @@ export function SendForm() {
             {m === "handle"
               ? <AtIcon size={13} weight={mode === m ? "bold" : "regular"} />
               : <WalletIcon size={13} weight={mode === m ? "bold" : "regular"} />}
-            {m === "handle" ? "X Handle" : "Wallet Address"}
+            {m === "handle" ? "Username" : "Wallet Address"}
           </button>
         ))}
       </div>
 
       <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="space-y-3">
         <div>
-          <label className="text-xs text-white-4 mb-1.5 block">{mode === "handle" ? "X / Twitter handle" : "Wallet address"}</label>
+          <label className="text-xs text-white-4 mb-1.5 block">{mode === "handle" ? "Username" : "Wallet address"}</label>
           <input type="text" value={to} onChange={(e) => setTo(e.target.value)}
             placeholder={mode === "handle" ? "@username" : "0x..."} className={inp} required />
         </div>
@@ -81,8 +81,11 @@ export function SendForm() {
         <button type="submit" disabled={loading}
           className="w-full flex items-center justify-center gap-2 py-3 bg-primary hover:bg-primary-h text-white text-sm font-semibold rounded-2xl transition-all disabled:opacity-50 shadow-lg shadow-primary/20 active:scale-[0.98]">
           <PaperPlaneTiltIcon size={15} weight="fill" />
-          {loading ? "Sending..." : "Send privately"}
+          {loading ? "Sending..." : "Send"}
         </button>
+        <p className="text-center text-[11px] text-white-4/60">
+          Private transactions via ArcaneVM · <span className="text-white-4">coming soon</span>
+        </p>
       </form>
     </div>
   );

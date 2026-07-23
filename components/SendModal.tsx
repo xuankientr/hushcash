@@ -133,7 +133,7 @@ export function SendModal({ onClose }: { onClose: () => void }) {
                   <button key={m} onClick={() => { setMode(m); setTo(""); }}
                     className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-medium transition-all ${mode === m ? "bg-primary text-white" : "text-white-4 hover:text-white-2"}`}>
                     {m === "handle" ? <AtIcon size={12} /> : <WalletIcon size={12} />}
-                    {m === "handle" ? "X Handle" : "Wallet"}
+                    {m === "handle" ? "Username" : "Wallet"}
                   </button>
                 ))}
               </div>
@@ -165,8 +165,11 @@ export function SendModal({ onClose }: { onClose: () => void }) {
                 disabled={!to || loading}
                 className="w-full h-12 rounded-2xl bg-white text-black text-sm font-semibold hover:bg-white/90 transition-all disabled:opacity-30"
               >
-                {loading ? "Sending..." : "Send privately"}
+                {loading ? "Sending..." : "Send"}
               </button>
+              <p className="text-center text-[11px] text-white-4/60">
+                Private transactions via ArcaneVM · <span className="text-white-4">coming soon</span>
+              </p>
             </div>
           </>
         )}
