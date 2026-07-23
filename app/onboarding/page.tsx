@@ -23,9 +23,17 @@ export default function OnboardingPage() {
   const checkAvailability = useCallback(async (value: string) => {
     if (!isValidUsername(value)) { setStatus('invalid'); return; }
     setStatus('checking');
-    const res = await fetch(`/api/user/username?check=${encodeURIComponent(value)}`);
-    const data = await res.json();
-    setStatus(data.available ? 'available' : 'taken');
+    try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 5000);
+      const res = await fetch(`/api/user/username?check=${encodeURIComponent(value)}`, { signal: controller.signal });
+      clearTimeout(timer);
+      if (!res.ok) { setStatus('idle'); return; }
+      const data = await res.json();
+      setStatus(data.available ? 'available' : 'taken');
+    } catch {
+      setStatus('idle');
+    }
   }, []);
 
   useEffect(() => {
