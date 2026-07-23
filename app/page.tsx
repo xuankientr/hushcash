@@ -1,48 +1,59 @@
-import Link from 'next/link';
+'use client';
+
+import { usePrivy } from '@privy-io/react-auth';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export default function HomePage() {
+  const { ready, authenticated, login } = usePrivy();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (ready && authenticated) router.push('/dashboard');
+  }, [ready, authenticated, router]);
+
   return (
-    <main className='min-h-screen bg-white flex flex-col'>
-      {/* Logo */}
-      <div className='flex justify-center pt-10'>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src='/logo.png' alt='HushCash' width={40} height={40} className='rounded-xl' />
+    <main className='min-h-screen bg-bg flex items-center justify-center px-4 relative overflow-hidden'>
+      {/* Ambient glow */}
+      <div className='pointer-events-none absolute inset-0'>
+        <div className='absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[480px] h-[480px] rounded-full bg-primary/[0.07] blur-[120px]' />
+        <div className='absolute bottom-0 left-1/2 -translate-x-1/2 w-[300px] h-[200px] rounded-full bg-primary/[0.04] blur-[80px]' />
       </div>
 
-      {/* Hero */}
-      <div className='flex-1 flex flex-col items-center justify-center px-6 text-center'>
-        <h1 className='text-[2.6rem] font-bold tracking-tight leading-tight text-gray-900'>
-          Send. Request. Claim.
-          <br />
-          <span className='text-gray-400'>Privately.</span>
-        </h1>
-
-        <p className='mt-5 text-[15px] text-gray-500 leading-relaxed max-w-xs'>
-          Private USDC payments on Arc.<br />
-          No bank. No middleman.
-        </p>
-
-        <Link
-          href='/login'
-          className='mt-8 inline-flex items-center justify-center w-72 h-14 rounded-full bg-gray-900 hover:bg-gray-800 text-white text-[15px] font-semibold transition-all active:scale-[0.98]'
-        >
-          Get started
-        </Link>
-
-        <div className='mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 bg-gray-50'>
-          <span className='w-2 h-2 rounded-full bg-primary' />
-          <span className='text-[13px] text-gray-500'>
-            ArcaneVM
-          </span>
-          <span className='text-gray-300 text-[13px]'>·</span>
-          <span className='text-[13px] text-gray-500'>
-            Privacy coming soon →
-          </span>
+      <div className='w-full max-w-[300px] relative z-10'>
+        {/* Logo */}
+        <div className='flex flex-col items-center mb-12'>
+          <div className='relative mb-5'>
+            <div className='absolute inset-0 scale-[1.4] rounded-3xl bg-primary/20 blur-2xl' />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src='/logo.png'
+              alt='HushCash'
+              width={64}
+              height={64}
+              className='relative rounded-2xl shadow-2xl'
+            />
+          </div>
+          <h1 className='text-[22px] font-bold text-white tracking-tight'>
+            HushCash
+          </h1>
+          <p className='text-sm text-white-4 mt-1.5 text-center'>
+            Private payments on Arc.
+          </p>
         </div>
+
+        {/* CTA */}
+        <button
+          onClick={login}
+          disabled={!ready}
+          className='w-full h-12 rounded-2xl bg-primary hover:bg-primary-h text-white text-sm font-semibold transition-all disabled:opacity-40 shadow-lg shadow-primary/20 active:scale-[0.98]'
+        >
+          {ready ? 'Get started' : 'Loading...'}
+        </button>
       </div>
 
       {/* Footer */}
-      <div className='flex items-center justify-center gap-4 pb-8'>
+      <div className='absolute bottom-6 left-0 right-0 flex items-center justify-center gap-4'>
         {[
           { label: 'X', href: 'https://x.com/hushcash_xyz' },
           { label: 'Docs', href: '/docs' },
@@ -52,7 +63,7 @@ export default function HomePage() {
           <a
             key={label}
             href={href}
-            className='text-[13px] text-gray-400 hover:text-gray-600 transition-colors'
+            className='text-[12px] text-white-3 hover:text-white-2 transition-colors'
           >
             {label}
           </a>
