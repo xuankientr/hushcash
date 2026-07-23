@@ -6,7 +6,7 @@ export default async function PayPage({ params }: { params: Promise<{ code: stri
   const { code } = await params;
   const request = await prisma.paymentRequest.findUnique({
     where: { code },
-    include: { user: { select: { twitterHandle: true, twitterName: true, twitterAvatar: true, walletAddress: true } } },
+    include: { user: { select: { username: true, walletAddress: true } } },
   });
 
   if (!request || request.status !== "ACTIVE") notFound();
@@ -18,7 +18,7 @@ export default async function PayPage({ params }: { params: Promise<{ code: stri
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo.png" alt="HushCash" width={40} height={40} className="rounded-xl mb-3" />
           <h1 className="text-lg font-bold text-white">Payment Request</h1>
-          <p className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.4)" }}>Pay privately · address stays hidden</p>
+          <p className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.4)" }}>Private payments via ArcaneVM · coming soon</p>
         </div>
         <PayWidget request={request} />
       </div>

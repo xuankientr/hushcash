@@ -8,9 +8,18 @@ export const privyClient = new PrivyClient(
   process.env.PRIVY_APP_SECRET!,
 );
 
-export async function getAuthUser() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("privy-token")?.value;
+export async function getAuthUser(req?: import("next/server").NextRequest) {
+  // Prefer Authorization header (sent by client for public pages like /pay)
+  let token: string | undefined;
+  if (req) {
+    const auth = req.headers.get("authorization");
+    if (auth?.startsWith("Bearer ")) token = auth.slice(7);
+  }
+  // Fall back to cookie (works inside (app) layout)
+  if (!token) {
+    const cookieStore = await cookies();
+    token = cookieStore.get("privy-token")?.value;
+  }
   if (!token) return null;
   let claims;
   try {
@@ -21,9 +30,16 @@ export async function getAuthUser() {
   return prisma.user.findUnique({ where: { privyDid: claims.userId } });
 }
 
-export async function getOrCreateAuthUser() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("privy-token")?.value;
+export async function getOrCreateAuthUser(req?: import("next/server").NextRequest) {
+  let token: string | undefined;
+  if (req) {
+    const auth = req.headers.get("authorization");
+    if (auth?.startsWith("Bearer ")) token = auth.slice(7);
+  }
+  if (!token) {
+    const cookieStore = await cookies();
+    token = cookieStore.get("privy-token")?.value;
+  }
   if (!token) return null;
 
   let claims;

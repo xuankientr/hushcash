@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAuthUser } from "@/lib/privy-server";
+import { getOrCreateAuthUser } from "@/lib/privy-server";
 import { prisma } from "@/lib/prisma";
 import { transferUsdc } from "@/lib/circle";
 import { isValidAddress, isHandle, normalizeHandle } from "@/lib/utils";
@@ -14,8 +14,9 @@ const schema = z.object({
 });
 
 export async function POST(req: NextRequest) {
-  const user = await getAuthUser();
+  const user = await getOrCreateAuthUser(req);
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!user.walletId) return NextResponse.json({ error: "Wallet not ready yet — open the app first to finish setup" }, { status: 400 });
 
   if (!checkRateLimit(`transfer:${user.id}`, 10, 60_000).ok) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
@@ -26,8 +27,6 @@ export async function POST(req: NextRequest) {
   if (!parsed.success) return NextResponse.json({ error: "Invalid input" }, { status: 400 });
 
   const { to, amountUsdc, note, requestCode } = parsed.data;
-
-  if (!user.walletId) return NextResponse.json({ error: "Wallet not found" }, { status: 400 });
 
   let destinationAddress: string;
   let receiverId: string | undefined;

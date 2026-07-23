@@ -2,15 +2,49 @@
 
 import { usePrivy } from '@privy-io/react-auth';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function HomePage() {
   const { ready, authenticated, login } = usePrivy();
   const router = useRouter();
+  const [settingUp, setSettingUp] = useState(false);
 
   useEffect(() => {
-    if (ready && authenticated) router.push('/dashboard');
+    if (ready && authenticated) {
+      setSettingUp(true);
+      router.push('/dashboard');
+    }
   }, [ready, authenticated, router]);
+
+  if (settingUp) {
+    return (
+      <main className='min-h-screen bg-bg flex items-center justify-center px-4'>
+        <div className='flex flex-col items-center gap-5'>
+          {/* Spinner */}
+          <div className='relative w-14 h-14'>
+            <div className='absolute inset-0 rounded-full border-2 border-white/[0.08]' />
+            <div
+              className='absolute inset-0 rounded-full border-2 border-transparent border-t-primary'
+              style={{ animation: 'spin 0.9s linear infinite' }}
+            />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src='/logo.png'
+              alt=''
+              width={28}
+              height={28}
+              className='absolute inset-0 m-auto rounded-lg'
+            />
+          </div>
+          <div className='text-center space-y-1'>
+            <p className='text-sm font-semibold text-white'>Setting up your account</p>
+            <p className='text-xs text-white-4'>Creating your wallet on Arc…</p>
+          </div>
+        </div>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </main>
+    );
+  }
 
   return (
     <main className='min-h-screen bg-bg flex items-center justify-center px-4 relative overflow-hidden'>
