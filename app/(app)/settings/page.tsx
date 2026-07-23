@@ -43,7 +43,7 @@ export default async function SettingsPage() {
   return (
     <SettingsClient
       walletAddress={user.walletAddress}
-      displayName={user.twitterHandle ?? user.twitterName}
+      displayName={user.username}
       totalSent={sum(sentTransfers)}
       totalReceived={sum(receivedTransfers)}
       totalRequested={sum(paymentRequests)}

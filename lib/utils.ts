@@ -23,10 +23,24 @@ export function isValidAddress(address: string): boolean {
   return /^0x[a-fA-F0-9]{40}$/.test(address);
 }
 
-export function isTwitterHandle(input: string): boolean {
-  return /^@?[a-zA-Z0-9_]{1,15}$/.test(input);
+export function isHandle(input: string): boolean {
+  return /^@[a-zA-Z0-9_]{3,20}$/.test(input);
 }
 
 export function normalizeHandle(handle: string): string {
   return handle.startsWith("@") ? handle.slice(1) : handle;
+}
+
+export function isValidUsername(username: string): boolean {
+  return /^[a-zA-Z0-9_]{3,20}$/.test(username) && !/^_|_$/.test(username);
+}
+
+const WORDS_A = ["swift","quiet","bold","bright","cool","dark","fast","calm","wild","sharp","clean","pure","free","raw","keen"];
+const WORDS_B = ["fox","wave","star","bear","hawk","wolf","lynx","oak","pine","reef","jade","echo","nova","flux","sage"];
+
+export function generateUsername(): string {
+  const a = WORDS_A[Math.floor(Math.random() * WORDS_A.length)];
+  const b = WORDS_B[Math.floor(Math.random() * WORDS_B.length)];
+  const n = String(Math.floor(Math.random() * 9000) + 1000);
+  return `${a}_${b}_${n}`;
 }

@@ -5,6 +5,7 @@ import { BottomNav } from "@/components/BottomNav";
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const user = await getOrCreateAuthUser();
   if (!user) redirect("/login");
+  if (!user.username) redirect("/onboarding");
 
   return (
     <div className="min-h-screen bg-bg">

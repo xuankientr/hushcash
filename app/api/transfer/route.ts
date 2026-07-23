@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAuthUser } from "@/lib/privy-server";
 import { prisma } from "@/lib/prisma";
 import { transferUsdc } from "@/lib/circle";
-import { isValidAddress, isTwitterHandle, normalizeHandle } from "@/lib/utils";
+import { isValidAddress, isHandle, normalizeHandle } from "@/lib/utils";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { z } from "zod";
 
@@ -40,10 +40,10 @@ export async function POST(req: NextRequest) {
       select: { id: true },
     });
     if (addrUser) receiverId = addrUser.id;
-  } else if (isTwitterHandle(to)) {
+  } else if (isHandle(to)) {
     const handle = normalizeHandle(to);
     const recipient = await prisma.user.findUnique({
-      where: { twitterHandle: handle },
+      where: { username: handle },
       select: { id: true, walletAddress: true },
     });
     if (!recipient?.walletAddress) {
