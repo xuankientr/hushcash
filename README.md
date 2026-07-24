@@ -9,9 +9,6 @@ Private peer-to-peer payments on Arc. Send, request, invoice, and drop USDC — 
 ## Overview
 
 HushCash is a non-custodial payments app built natively on Arc. Users sign in with email via Privy and get a Circle Developer Controlled Wallet created for them automatically — no seed phrases, no setup friction.
-
-USDC is both the payment token and the gas token on Arc, so every action in the app costs USDC with no ETH required.
-
 ## Features
 
 - **Send** — Pay anyone by @username or wallet address
