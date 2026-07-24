@@ -10,7 +10,7 @@ const cards = [
   {
     icon: '→',
     title: 'Send',
-    desc: 'Send USDC privately to any address, X handle, or payment link.',
+    desc: 'Send USDC to any @username or wallet address.',
     href: '/docs/send',
   },
   {
@@ -18,6 +18,12 @@ const cards = [
     title: 'Request',
     desc: 'Generate a shareable payment link to request USDC from anyone.',
     href: '/docs/request',
+  },
+  {
+    icon: '📄',
+    title: 'Invoice',
+    desc: 'Create an invoice with proof of work and get paid via a shareable link.',
+    href: '/docs/invoice',
   },
   {
     icon: '⤵',
@@ -89,12 +95,12 @@ export default function DocsPage() {
         <h2 className='text-base font-semibold text-gray-900'>Why HushCash</h2>
         <ul className='space-y-2'>
           {[
-            'No wallet required to pay — anyone can send via a link.',
-            'Pay by X handle, wallet address, or shareable link.',
+            'No wallet required to pay — anyone can settle via a link.',
+            'Pay by @username or wallet address.',
+            'Invoice with proof of work — photo, gallery upload, or URL.',
             'Native USDC on Arc — fast finality, near-zero fees.',
             'Non-custodial wallets powered by Circle.',
-            'Transaction memos — attach invoice refs, notes, or categories to any payment.',
-            'Selective disclosure — choose which memo fields are public or private per transaction.',
+            'Drop Cash — claimable links backed by on-chain escrow.',
             'On-chain privacy via ArcaneVM — coming soon.',
           ].map((item) => (
             <li
@@ -113,7 +119,7 @@ export default function DocsPage() {
         <h2 className='text-base font-semibold text-gray-900'>How it works</h2>
         <ol className='space-y-3'>
           {[
-            ['Sign in', 'Connect with your X account or email via Privy.'],
+            ['Sign in', 'Connect with your email via Privy.'],
             [
               'Get a wallet',
               'A non-custodial Arc wallet is created automatically — no seed phrase needed.',
@@ -123,8 +129,8 @@ export default function DocsPage() {
               'Fund your wallet by sending USDC to your Arc address.',
             ],
             [
-              'Send privately',
-              'Pay by address, X handle, or link. Recipients see amounts, not identities.',
+              'Send or invoice',
+              'Pay by @username, wallet address, or link. Create invoices with proof of work.',
             ],
           ].map(([step, desc], i) => (
             <li key={step} className='flex gap-3.5'>
