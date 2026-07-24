@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { XLogo } from '@phosphor-icons/react/dist/ssr';
+import { DocsMobileNav } from '@/components/DocsMobileNav';
 
 const nav = [
   {
@@ -86,21 +87,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
 
       {/* Mobile top nav */}
       <div className="md:hidden flex flex-col w-full">
-        <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-200 bg-gray-50">
-          <Link href="/" className="flex items-center gap-1.5 mr-3">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.png" alt="HushCash" width={18} height={18} className="rounded-md" />
-            <span className="text-xs font-semibold text-gray-900">HushCash</span>
-          </Link>
-          <div className="flex gap-1 overflow-x-auto pb-0.5 scrollbar-none">
-            {nav.flatMap((g) => g.items).map(({ label, href }) => (
-              <Link key={href} href={href}
-                className="flex-shrink-0 px-2.5 py-1 rounded-full text-[11px] font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-200 transition-colors whitespace-nowrap">
-                {label}
-              </Link>
-            ))}
-          </div>
-        </div>
+        <DocsMobileNav />
         <main className="px-4 py-8 w-full">{children}</main>
       </div>
 

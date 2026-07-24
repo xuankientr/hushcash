@@ -136,6 +136,7 @@ function WithdrawModal({ onClose }: { onClose: () => void }) {
 }
 
 function UsernameEditor({ current }: { current: string | null }) {
+  const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(current ?? "");
   const [status, setStatus] = useState<"idle" | "checking" | "available" | "taken" | "invalid">("idle");
@@ -167,7 +168,7 @@ function UsernameEditor({ current }: { current: string | null }) {
       body: JSON.stringify({ username: value }),
     });
     setSaving(false);
-    if (res.ok) { setEditing(false); }
+    if (res.ok) { setEditing(false); router.refresh(); }
     else setStatus("taken");
   }
 
