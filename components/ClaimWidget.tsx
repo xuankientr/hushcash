@@ -63,7 +63,7 @@ export function ClaimWidget({ link }: ClaimWidgetProps) {
         </div>
         {error && <div className="rounded-lg bg-down/10 border border-down/20 px-3 py-2"><p className="text-xs text-down">{error}</p></div>}
         <button type="submit" disabled={loading}
-          className="w-full flex items-center justify-center gap-2 py-2.5 bg-primary hover:bg-primary-h text-white text-sm font-semibold rounded-lg transition-colors disabled:opacity-50">
+          className="w-full flex items-center justify-center gap-2 py-3.5 bg-primary hover:bg-primary-h text-white text-sm font-semibold rounded-lg transition-colors disabled:opacity-50">
           {loading ? "Claiming..." : `Claim ${formatUsdc(link.amountUsdc)}`}
         </button>
       </form>

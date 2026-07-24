@@ -58,7 +58,7 @@ export function PayWidget({ request }: PayWidgetProps) {
           <p className="text-xs text-white-4 text-center">You need to be signed in to pay</p>
           <button
             onClick={login}
-            className="w-full flex items-center justify-center gap-2 py-2.5 bg-primary hover:bg-primary-h text-white text-sm font-semibold rounded-lg transition-colors"
+            className="w-full flex items-center justify-center gap-2 py-3.5 bg-primary hover:bg-primary-h text-white text-sm font-semibold rounded-lg transition-colors"
           >
             Sign in to pay
           </button>
@@ -95,7 +95,7 @@ export function PayWidget({ request }: PayWidgetProps) {
           </div>
           {error && <div className="rounded-lg bg-down/10 border border-down/20 px-3 py-2"><p className="text-xs text-down">{error}</p></div>}
           <button type="submit" disabled={loading || !ready}
-            className="w-full flex items-center justify-center gap-2 py-2.5 bg-primary hover:bg-primary-h text-white text-sm font-semibold rounded-lg transition-colors disabled:opacity-50">
+            className="w-full flex items-center justify-center gap-2 py-3.5 bg-primary hover:bg-primary-h text-white text-sm font-semibold rounded-lg transition-colors disabled:opacity-50">
             <PaperPlaneTiltIcon size={15} weight="fill" />
             {loading ? "Sending..." : amount ? `Pay ${formatUsdc(amount)}` : "Pay"}
           </button>

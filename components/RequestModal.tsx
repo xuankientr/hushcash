@@ -39,12 +39,12 @@ export function RequestModal({ onClose }: { onClose: () => void }) {
             <ArrowDownLeftIcon size={16} weight="bold" />
             <span>Request</span>
           </div>
-          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full bg-white/[0.06] text-white-4 hover:text-white transition-colors">
+          <button onClick={onClose} className="w-11 h-11 flex items-center justify-center rounded-full bg-white/[0.06] text-white-4 hover:text-white transition-colors">
             <XIcon size={14} weight="bold" />
           </button>
         </div>
 
-        <div className="px-5 pb-5 space-y-3">
+        <div className="px-5 space-y-3" style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom))' }}>
           {!url ? (
             <>
               <div className="relative">

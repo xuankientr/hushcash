@@ -23,7 +23,7 @@ export function BalanceCard({ walletId }: { walletId?: string | null }) {
       {isLoading ? (
         <div className='h-14 w-44 bg-white/[0.05] rounded-2xl animate-pulse mx-auto' />
       ) : (
-        <span className='text-[56px] font-bold text-white tracking-tight leading-none'>
+        <span className='font-bold text-white tracking-tight leading-none' style={{ fontSize: 'clamp(2rem, 12vw, 3.5rem)' }}>
           {hidden ? '$ ••••••' : formatUsdc(balance)}
         </span>
       )}
@@ -35,7 +35,7 @@ export function BalanceCard({ walletId }: { walletId?: string | null }) {
         <div className='flex items-center gap-1'>
           <button
             onClick={() => refetch()}
-            className='w-6 h-6 flex items-center justify-center text-white-4 hover:text-white-3 transition-colors'
+            className='w-10 h-10 flex items-center justify-center text-white-4 hover:text-white-3 transition-colors'
           >
             <ArrowsClockwiseIcon
               size={13}
@@ -44,7 +44,7 @@ export function BalanceCard({ walletId }: { walletId?: string | null }) {
           </button>
           <button
             onClick={() => setHidden((h) => !h)}
-            className='w-6 h-6 flex items-center justify-center text-white-4 hover:text-white-3 transition-colors'
+            className='w-10 h-10 flex items-center justify-center text-white-4 hover:text-white-3 transition-colors'
           >
             {hidden ? <EyeSlashIcon size={13} /> : <EyeIcon size={13} />}
           </button>

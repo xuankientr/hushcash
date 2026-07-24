@@ -49,11 +49,11 @@ function DepositModal({ walletAddress, onClose }: { walletAddress: string | null
             <ArrowDownIcon size={16} weight="bold" />
             <span>Deposit</span>
           </div>
-          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full bg-white/[0.06] text-white-4 hover:text-white transition-colors">
+          <button onClick={onClose} className="w-11 h-11 flex items-center justify-center rounded-full bg-white/[0.06] text-white-4 hover:text-white transition-colors">
             <XIcon size={14} weight="bold" />
           </button>
         </div>
-        <div className="px-5 pb-5 space-y-3">
+        <div className="px-5 space-y-3" style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom))' }}>
           <p className="text-xs text-white-4 leading-relaxed">
             Send USDC to your wallet address on <span className="text-white-3">Arc Testnet</span>.
           </p>
@@ -101,11 +101,11 @@ function WithdrawModal({ onClose }: { onClose: () => void }) {
             <ArrowUpIcon size={16} weight="bold" />
             <span>Withdraw</span>
           </div>
-          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full bg-white/[0.06] text-white-4 hover:text-white transition-colors">
+          <button onClick={onClose} className="w-11 h-11 flex items-center justify-center rounded-full bg-white/[0.06] text-white-4 hover:text-white transition-colors">
             <XIcon size={14} weight="bold" />
           </button>
         </div>
-        <div className="px-5 pb-5 space-y-3">
+        <div className="px-5 space-y-3" style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom))' }}>
           {success ? (
             <div className="py-6 text-center">
               <CheckCircleIcon size={40} weight="duotone" className="text-up mx-auto mb-3" />
@@ -184,7 +184,7 @@ function UsernameEditor({ current }: { current: string | null }) {
           </p>
         </div>
         <button onClick={() => { setEditing(true); setValue(current ?? ""); setStatus("idle"); }}
-          className="w-8 h-8 flex items-center justify-center rounded-full bg-white/[0.06] text-white-4 hover:text-white transition-colors">
+          className="w-11 h-11 flex items-center justify-center rounded-full bg-white/[0.06] text-white-4 hover:text-white transition-colors">
           <PencilSimpleIcon size={13} weight="bold" />
         </button>
       </div>
@@ -271,7 +271,7 @@ export function SettingsClient({ walletAddress, displayName, totalSent, totalRec
                 <p className="text-sm font-mono text-white-2">{shortenAddress(walletAddress)}</p>
               </div>
               <button onClick={handleCopy}
-                className="w-8 h-8 flex items-center justify-center rounded-full bg-white/[0.06] text-white-4 hover:text-white transition-colors">
+                className="w-11 h-11 flex items-center justify-center rounded-full bg-white/[0.06] text-white-4 hover:text-white transition-colors">
                 {copied ? <CheckIcon size={13} weight="bold" className="text-up" /> : <CopyIcon size={13} />}
               </button>
             </div>

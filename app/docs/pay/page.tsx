@@ -106,8 +106,8 @@ export default function HushCashPayPage() {
         <h2 className="text-base font-semibold text-gray-900">Why HushCash Pay</h2>
         <div className="space-y-2">
           {benefits.map(({ title, desc }) => (
-            <div key={title} className="flex gap-3 px-4 py-3 rounded-xl border border-gray-200 bg-gray-50">
-              <p className="text-[12px] font-semibold text-gray-800 w-32 flex-shrink-0">{title}</p>
+            <div key={title} className="flex flex-col sm:flex-row gap-1 sm:gap-3 px-4 py-3 rounded-xl border border-gray-200 bg-gray-50">
+              <p className="text-[12px] font-semibold text-gray-800 sm:w-32 sm:flex-shrink-0">{title}</p>
               <p className="text-[12px] text-gray-500 leading-relaxed">{desc}</p>
             </div>
           ))}
@@ -126,8 +126,8 @@ export default function HushCashPayPage() {
             { label: 'Category tag', desc: 'Label payments by type — services, rent, goods — for automated bookkeeping.' },
             { label: 'Note or message', desc: 'Add a short note visible only to sender and recipient.' },
           ].map(({ label, desc }) => (
-            <div key={label} className="flex gap-3 px-4 py-3 rounded-xl border border-gray-200 bg-gray-50">
-              <p className="text-[12px] font-semibold text-gray-800 w-36 flex-shrink-0">{label}</p>
+            <div key={label} className="flex flex-col sm:flex-row gap-1 sm:gap-3 px-4 py-3 rounded-xl border border-gray-200 bg-gray-50">
+              <p className="text-[12px] font-semibold text-gray-800 sm:w-36 sm:flex-shrink-0">{label}</p>
               <p className="text-[12px] text-gray-500 leading-relaxed">{desc}</p>
             </div>
           ))}
