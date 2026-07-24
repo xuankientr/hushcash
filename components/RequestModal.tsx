@@ -85,8 +85,18 @@ export function RequestModal({ onClose }: { onClose: () => void }) {
             </>
           ) : (
             <div className="space-y-3">
+              <div className="flex justify-center pt-1">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=160x160&margin=8&data=${encodeURIComponent(url)}`}
+                  alt="Payment link QR"
+                  width={160}
+                  height={160}
+                  className="rounded-2xl"
+                />
+              </div>
               <div className="rounded-2xl bg-up/10 border border-up/20 px-4 py-3">
-                <p className="text-xs text-up font-medium mb-2">Link ready — share it</p>
+                <p className="text-xs text-up font-medium mb-2">Link ready — share or scan</p>
                 <div className="flex items-center gap-2">
                   <p className="flex-1 text-xs text-white-2 font-mono truncate">{url}</p>
                   <button onClick={handleCopy} className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-xl bg-white/[0.08] text-white-3 hover:text-white transition-colors">

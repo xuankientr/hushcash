@@ -6,6 +6,7 @@ import { BalanceCard } from "./BalanceCard";
 import { TransactionList } from "./TransactionList";
 import { SendModal } from "./SendModal";
 import { RequestModal } from "./RequestModal";
+import { SplitModal } from "./SplitModal";
 
 type Transfer = {
   id: string; createdAt: Date; amountUsdc: string;
@@ -13,7 +14,7 @@ type Transfer = {
   status: string; direction: "sent" | "received";
 };
 
-type Modal = null | "send" | "request";
+type Modal = null | "send" | "request" | "split";
 
 export function DashboardClient({
   walletId,
@@ -63,6 +64,12 @@ export function DashboardClient({
           >
             Invoice
           </button>
+          <button
+            onClick={() => setModal("split")}
+            className="flex-1 h-12 rounded-2xl border border-white/[0.12] text-white text-sm font-semibold hover:bg-white/[0.05] transition-all active:scale-[0.97]"
+          >
+            Split
+          </button>
         </div>
 
         {/* Activity */}
@@ -71,6 +78,7 @@ export function DashboardClient({
 
       {modal === "send" && <SendModal onClose={() => setModal(null)} />}
       {modal === "request" && <RequestModal onClose={() => setModal(null)} />}
+      {modal === "split" && <SplitModal onClose={() => setModal(null)} />}
     </>
   );
 }

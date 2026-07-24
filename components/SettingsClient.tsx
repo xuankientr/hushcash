@@ -57,6 +57,18 @@ function DepositModal({ walletAddress, onClose }: { walletAddress: string | null
           <p className="text-xs text-white-4 leading-relaxed">
             Send USDC to your wallet address on <span className="text-white-3">Arc Testnet</span>.
           </p>
+          {walletAddress && (
+            <div className="flex justify-center py-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=160x160&margin=8&data=${encodeURIComponent(walletAddress)}`}
+                alt="Wallet QR"
+                width={160}
+                height={160}
+                className="rounded-2xl"
+              />
+            </div>
+          )}
           <div className="flex items-center gap-2 bg-black/30 border border-white/[0.07] rounded-2xl px-4 py-3">
             <p className="flex-1 text-xs font-mono text-white-2 truncate">
               {walletAddress ?? "Setting up wallet..."}
