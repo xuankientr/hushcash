@@ -2,5 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type { DropCashEscrow } from "./DropCashEscrow";
+export type { InvoiceRegistry } from "./InvoiceRegistry";
 export * as factories from "./factories";
 export { DropCashEscrow__factory } from "./factories/DropCashEscrow__factory";
+export { InvoiceRegistry__factory } from "./factories/InvoiceRegistry__factory";

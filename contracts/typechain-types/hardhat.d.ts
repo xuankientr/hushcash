@@ -17,23 +17,41 @@ declare module "hardhat/types/runtime" {
       name: "DropCashEscrow",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.DropCashEscrow__factory>;
+    getContractFactory(
+      name: "InvoiceRegistry",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.InvoiceRegistry__factory>;
 
     getContractAt(
       name: "DropCashEscrow",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.DropCashEscrow>;
+    getContractAt(
+      name: "InvoiceRegistry",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.InvoiceRegistry>;
 
     deployContract(
       name: "DropCashEscrow",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.DropCashEscrow>;
+    deployContract(
+      name: "InvoiceRegistry",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.InvoiceRegistry>;
 
     deployContract(
       name: "DropCashEscrow",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.DropCashEscrow>;
+    deployContract(
+      name: "InvoiceRegistry",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.InvoiceRegistry>;
 
     // default types
     getContractFactory(

@@ -2,3 +2,4 @@
 /* tslint:disable */
 /* eslint-disable */
 export { DropCashEscrow__factory } from "./DropCashEscrow__factory";
+export { InvoiceRegistry__factory } from "./InvoiceRegistry__factory";

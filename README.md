@@ -1,6 +1,6 @@
 # HushCash
 
-Private payments on Arc. Send, request, and drop USDC — without exposing your identity on-chain.
+Private peer-to-peer payments on Arc. Send, request, invoice, and drop USDC — with a wallet that sets itself up automatically.
 
 🌐 [hushcash.xyz](https://hushcash.xyz)
 
@@ -8,36 +8,45 @@ Private payments on Arc. Send, request, and drop USDC — without exposing your 
 
 ## Overview
 
-HushCash is a non-custodial payments app built natively on Arc. It uses USDC as both the payment token and gas, with wallets powered by Circle Developer Controlled Wallets (DCW).
+HushCash is a non-custodial payments app built natively on Arc. Users sign in with email via Privy and get a Circle Developer Controlled Wallet created for them automatically — no seed phrases, no setup friction.
 
-Users can send USDC by X (Twitter) handle, wallet address, or shareable link — without revealing their identity to the recipient.
+USDC is both the payment token and the gas token on Arc, so every action in the app costs USDC with no ETH required.
 
 ## Features
 
-- **Send** — Pay anyone by @handle, 0x address, or pay link
-- **Request** — Generate a shareable payment link for a fixed or open amount
-- **Drop Cash** — Pre-load a claimable link; anyone with the link can claim the funds
-- **HushCash Pay** — Merchant payments via QR code, with live USDC/VND conversion
+- **Send** — Pay anyone by @username or wallet address
+- **Request** — Generate a shareable payment link; anyone can pay without an account
+- **Invoice** — Create an invoice with an amount, description, and proof of work (photo, gallery upload, or URL); share a link; payer settles in one tap
+- **Drop Cash** — Pre-load a claimable link backed by on-chain escrow; whoever has the link can claim the funds
+- **Username** — Claim a unique @handle; others can pay you by name instead of address
+- **Settings** — View balance, activity history, deposit address, and withdraw to any wallet
 
 ## Smart Contracts
 
-| Contract | Network | Address |
-|----------|---------|---------|
-| DropCashEscrow | Arc Testnet | [`0x395F664bd86945074eE8145c947bc3A2887E4F7F`](https://testnet.arcscan.app/address/0x395F664bd86945074eE8145c947bc3A2887E4F7F) |
-| PrivacyRouter *(coming soon)* | Arc Testnet | Pending ArcaneVM availability |
+Both contracts are deployed on Arc Testnet.
 
-Contract source: [`contracts/contracts/DropCashEscrow.sol`](contracts/contracts/DropCashEscrow.sol)
+| Contract | Address |
+|----------|---------|
+| DropCashEscrow | [`0x31D4F6B87E042D4849B586880d30c0D6102Ba2cd`](https://testnet.arcscan.app/address/0x31D4F6B87E042D4849B586880d30c0D6102Ba2cd) |
+| InvoiceRegistry | [`0x87090C9d427e71c8E2661D483a11A8DeE3a9Bd88`](https://testnet.arcscan.app/address/0x87090C9d427e71c8E2661D483a11A8DeE3a9Bd88) |
 
-> Once ArcaneVM is live on Arc Testnet, HushCash will deploy a confidential payment router that processes transfers inside a hardware-secured enclave — making transaction data cryptographically private at the protocol level.
+**DropCashEscrow** — trustless escrow for drop links. Creator deposits USDC locked to a `keccak256(code)` hash; claimant proves knowledge of the code to withdraw.
+
+**InvoiceRegistry** — on-chain invoice lifecycle. Service provider registers an invoice by code + amount; client pays with exact native USDC; funds transfer directly to the creator.
+
+Source: [`contracts/contracts/`](contracts/contracts/)
 
 ## Tech Stack
 
-- **Frontend / API** — Next.js 15 (App Router), TypeScript, Tailwind CSS
-- **Auth** — Privy (X / email login)
-- **Wallets** — Circle Developer Controlled Wallets (DCW)
-- **Chain** — Arc Testnet (Chain ID 5042002, native USDC)
-- **Database** — PostgreSQL (Supabase)
-- **Contracts** — Solidity 0.8.24, Hardhat
+| Layer | Technology |
+|-------|-----------|
+| Frontend / API | Next.js 15 (App Router), TypeScript, Tailwind CSS |
+| Auth | Privy (email login) |
+| Wallets | Circle Developer Controlled Wallets (DCW) |
+| Chain | Arc Testnet — Chain ID 5042002, native USDC |
+| Database | PostgreSQL via Supabase + Prisma ORM |
+| Contracts | Solidity 0.8.24, Hardhat |
+| Hosting | Vercel |
 
 ## Arc Network
 
@@ -47,20 +56,50 @@ Contract source: [`contracts/contracts/DropCashEscrow.sol`](contracts/contracts/
 | RPC | `https://rpc.testnet.arc.network` |
 | Gas token | USDC (native) |
 | Explorer | [testnet.arcscan.app](https://testnet.arcscan.app) |
+| Faucet | [faucet.testnet.arc.network](https://faucet.testnet.arc.network) |
 
 ## Project Structure
 
 ```
-app/          # Next.js app (pages + API routes)
-components/   # React components
-lib/          # Circle, Privy, Prisma clients
-prisma/       # Database schema
-contracts/    # Solidity contracts + Hardhat
-public/       # Static assets
+app/
+  (app)/          # Authenticated pages (dashboard, settings, invoice/new)
+  invoice/[code]/ # Public invoice page
+  pay/[code]/     # Public pay-request page
+  api/            # API routes (transfer, invoice, drop, user, wallet)
+components/       # React UI components
+lib/              # Circle, Privy, Prisma clients + utilities
+prisma/           # Database schema
+contracts/        # Solidity contracts + Hardhat config
+public/           # Static assets
 ```
+
+## Getting Started
+
+```bash
+# Install dependencies
+npm install
+
+# Set up environment
+cp .env.example .env
+# Fill in DATABASE_URL, PRIVY_*, CIRCLE_* values
+
+# Push schema to database
+npx prisma db push
+
+# Run dev server
+npm run dev
+```
+
+## Deploying Contracts
+
+```bash
+cd contracts
+npm install
+npx hardhat run scripts/deploy.ts --network arc-testnet
+```
+
+Requires `PRIVATE_KEY` in `contracts/.env` — the deployer wallet needs Arc Testnet USDC for gas.
 
 ## Status
 
-HushCash is currently in **waitlist mode** on Arc Testnet. On-chain privacy via ArcaneVM will be integrated once available on testnet.
-
-Join the waitlist at [hushcash.xyz](https://hushcash.xyz).
+HushCash is live in **waitlist mode** on Arc Testnet. Join at [hushcash.xyz](https://hushcash.xyz).
