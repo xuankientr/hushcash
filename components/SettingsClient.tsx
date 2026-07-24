@@ -1,14 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { usePrivy } from "@privy-io/react-auth";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import {
   CopyIcon, CheckIcon, SignOutIcon, XIcon,
   ArrowDownIcon, ArrowUpIcon, CheckCircleIcon,
+  PencilSimpleIcon,
 } from "@phosphor-icons/react";
-import { formatUsdc, shortenAddress } from "@/lib/utils";
+import { formatUsdc, shortenAddress, isValidUsername } from "@/lib/utils";
 import { TransactionList } from "./TransactionList";
 
 type Tab = "wallet" | "activity";
@@ -134,6 +135,82 @@ function WithdrawModal({ onClose }: { onClose: () => void }) {
   );
 }
 
+function UsernameEditor({ current }: { current: string | null }) {
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(current ?? "");
+  const [status, setStatus] = useState<"idle" | "checking" | "available" | "taken" | "invalid">("idle");
+  const [saving, setSaving] = useState(false);
+
+  const check = useCallback(async (v: string) => {
+    if (!isValidUsername(v)) { setStatus("invalid"); return; }
+    if (v === current) { setStatus("available"); return; }
+    setStatus("checking");
+    try {
+      const res = await fetch(`/api/user/username?check=${encodeURIComponent(v)}`);
+      const data = await res.json();
+      setStatus(data.available ? "available" : "taken");
+    } catch { setStatus("idle"); }
+  }, [current]);
+
+  useEffect(() => {
+    if (!editing) return;
+    const t = setTimeout(() => check(value), 400);
+    return () => clearTimeout(t);
+  }, [value, editing, check]);
+
+  async function handleSave() {
+    if (status !== "available") return;
+    setSaving(true);
+    const res = await fetch("/api/user/username", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: value }),
+    });
+    setSaving(false);
+    if (res.ok) { setEditing(false); }
+    else setStatus("taken");
+  }
+
+  const statusColor = { idle: "", checking: "text-white-4", available: "text-green-400", taken: "text-red-400", invalid: "text-yellow-400" }[status];
+  const statusText = { idle: "", checking: "Checking...", available: "✓ Available", taken: "Already taken", invalid: "3–20 chars, letters/numbers/underscores" }[status];
+
+  if (!editing) {
+    return (
+      <div className="flex items-center gap-2">
+        <span className="text-base font-bold text-white">
+          {current ? `@${current}` : <span className="text-white-4 font-normal text-sm">No username set</span>}
+        </span>
+        <button onClick={() => { setEditing(true); setValue(current ?? ""); setStatus("idle"); }}
+          className="w-7 h-7 flex items-center justify-center rounded-full bg-white/[0.06] text-white-4 hover:text-white transition-colors">
+          <PencilSimpleIcon size={13} weight="bold" />
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-2 w-full">
+      <div className="flex items-center gap-2 h-10 px-3 rounded-xl bg-white/[0.04] border border-white/[0.10] focus-within:border-primary/50 transition-colors">
+        <span className="text-white-4 font-medium text-sm select-none">@</span>
+        <input autoFocus value={value}
+          onChange={(e) => setValue(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))}
+          maxLength={20} className="flex-1 bg-transparent text-white text-sm outline-none" />
+      </div>
+      {statusText && <p className={`text-[11px] px-1 ${statusColor}`}>{statusText}</p>}
+      <div className="flex gap-2">
+        <button onClick={handleSave} disabled={status !== "available" || saving}
+          className="flex-1 h-9 rounded-xl bg-primary text-white text-xs font-semibold hover:bg-primary-h transition-all disabled:opacity-40">
+          {saving ? "Saving..." : "Save"}
+        </button>
+        <button onClick={() => setEditing(false)}
+          className="h-9 px-4 rounded-xl border border-white/[0.08] text-white-4 text-xs hover:text-white transition-colors">
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export function SettingsClient({ walletAddress, displayName, totalSent, totalReceived, totalRequested, totalClaimed, transfers }: Props) {
   const [tab, setTab] = useState<Tab>("wallet");
   const [copied, setCopied] = useState(false);
@@ -162,10 +239,6 @@ export function SettingsClient({ walletAddress, displayName, totalSent, totalRec
     router.push("/");
   }
 
-  const identifier = walletAddress
-    ? shortenAddress(walletAddress)
-    : displayName ?? "User";
-
   return (
     <>
       <div className="max-w-sm mx-auto px-5 pt-14 space-y-5">
@@ -175,19 +248,34 @@ export function SettingsClient({ walletAddress, displayName, totalSent, totalRec
           <img src="/logo.png" alt="HushCash" width={32} height={32} className="rounded-xl" />
         </div>
 
-        {/* Address bar */}
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-mono font-medium text-white-2">{identifier}</span>
-          <div className="flex items-center gap-2">
-            <button onClick={handleCopy}
-              className="w-8 h-8 flex items-center justify-center rounded-full bg-white/[0.06] text-white-3 hover:text-white transition-colors">
-              {copied ? <CheckIcon size={14} weight="bold" className="text-up" /> : <CopyIcon size={14} />}
-            </button>
+        {/* Profile */}
+        <div className="hush-card p-4 space-y-3">
+          <div className="flex items-start justify-between gap-3">
+            {/* Avatar + username */}
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <div className="w-10 h-10 rounded-full bg-primary/20 border border-primary/30 flex-shrink-0 flex items-center justify-center">
+                <span className="text-sm font-bold text-primary">
+                  {displayName ? displayName[0].toUpperCase() : "?"}
+                </span>
+              </div>
+              <UsernameEditor current={displayName} />
+            </div>
             <button onClick={handleLogout}
-              className="w-8 h-8 flex items-center justify-center rounded-full bg-down/10 text-down hover:bg-down/20 transition-colors">
+              className="w-8 h-8 flex items-center justify-center rounded-full bg-down/10 text-down hover:bg-down/20 transition-colors flex-shrink-0">
               <SignOutIcon size={14} weight="bold" />
             </button>
           </div>
+
+          {/* Wallet address */}
+          {walletAddress && (
+            <div className="flex items-center gap-2 bg-black/20 border border-white/[0.06] rounded-xl px-3 py-2">
+              <p className="flex-1 text-[11px] font-mono text-white-4 truncate">{walletAddress}</p>
+              <button onClick={handleCopy}
+                className="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-lg text-white-4 hover:text-white transition-colors">
+                {copied ? <CheckIcon size={11} weight="bold" className="text-up" /> : <CopyIcon size={11} />}
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Tabs */}
