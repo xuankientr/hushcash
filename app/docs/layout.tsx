@@ -24,7 +24,7 @@ const nav = [
     group: 'Privacy',
     items: [
       { label: 'Arc Network', href: '/docs/arc' },
-      { label: 'ArcaneVM', href: '/docs/arcanevm' },
+      { label: 'Arc Privacy', href: '/docs/arc-privacy' },
     ],
   },
   {

@@ -168,7 +168,7 @@ export function SendModal({ onClose }: { onClose: () => void }) {
                 {loading ? "Sending..." : "Send"}
               </button>
               <p className="text-center text-[11px] text-white-4/60">
-                Private transactions via ArcaneVM · <span className="text-white-4">coming soon</span>
+                Private transactions via Arc Privacy · <span className="text-white-4">coming soon</span>
               </p>
             </div>
           </>

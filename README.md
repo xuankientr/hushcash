@@ -26,13 +26,13 @@ Both contracts are deployed on Arc Testnet.
 |----------|---------|
 | DropCashEscrow | [`0x31D4F6B87E042D4849B586880d30c0D6102Ba2cd`](https://testnet.arcscan.app/address/0x31D4F6B87E042D4849B586880d30c0D6102Ba2cd) |
 | InvoiceRegistry | [`0x87090C9d427e71c8E2661D483a11A8DeE3a9Bd88`](https://testnet.arcscan.app/address/0x87090C9d427e71c8E2661D483a11A8DeE3a9Bd88) |
-| PrivacyRouter *(coming soon)* | Pending ArcaneVM availability on testnet |
+| PrivacyRouter *(coming soon)* | Pending Arc Privacy availability on testnet |
 
 **DropCashEscrow** — trustless escrow for drop links. Creator deposits USDC locked to a `keccak256(code)` hash; claimant proves knowledge of the code to withdraw.
 
 **InvoiceRegistry** — on-chain invoice lifecycle. Service provider registers an invoice by code + amount; client pays with exact native USDC; funds transfer directly to the creator.
 
-**PrivacyRouter** *(coming soon)* — once ArcaneVM is live on Arc Testnet, HushCash will deploy a confidential payment router that processes transfers inside a hardware-secured enclave, making transaction data cryptographically private at the protocol level.
+**PrivacyRouter** *(coming soon)* — once Arc Privacy is live on Arc Testnet, HushCash will deploy a confidential payment router that routes transfers through Arc's confidential smart contract engine, making transaction data cryptographically private at the protocol level.
 
 Source: [`contracts/contracts/`](contracts/contracts/)
 

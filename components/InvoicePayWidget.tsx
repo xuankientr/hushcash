@@ -80,7 +80,7 @@ export function InvoicePayWidget({ invoiceCode, amountUsdc, walletAddress }: Pro
         {loading ? "Sending..." : `Pay ${formatUsdc(amountUsdc)}`}
       </button>
       <p className="text-center text-[11px]" style={{ color: "rgba(255,255,255,0.25)" }}>
-        Private payments via ArcaneVM · coming soon
+        Private payments via Arc Privacy · coming soon
       </p>
     </div>
   );

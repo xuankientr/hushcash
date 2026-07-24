@@ -40,8 +40,8 @@ export default function ArcPage() {
         <Link href="/docs/wallet" className="flex items-center gap-1.5 text-[13px] text-white-3 hover:text-white transition-colors">
           <span>←</span> Wallet
         </Link>
-        <Link href="/docs/arcanevm" className="flex items-center gap-1.5 text-[13px] text-white-3 hover:text-white transition-colors">
-          ArcaneVM <span>→</span>
+        <Link href="/docs/arc-privacy" className="flex items-center gap-1.5 text-[13px] text-white-3 hover:text-white transition-colors">
+          Arc Privacy <span>→</span>
         </Link>
       </div>
     </div>

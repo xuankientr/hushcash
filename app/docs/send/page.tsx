@@ -47,7 +47,7 @@ export default function SendPage() {
       <div className="space-y-3">
         <h2 className="text-base font-semibold text-white">Privacy</h2>
         <p className="text-sm text-white-3 leading-relaxed">
-          HushCash hides recipient identities in the app UI — your X handle or name is never shown to the sender unless you share your pay link publicly. Wallet-level on-chain privacy via ArcaneVM is coming in a future release.
+          HushCash hides recipient identities in the app UI — your X handle or name is never shown to the sender unless you share your pay link publicly. Wallet-level on-chain privacy via Arc Privacy is coming in a future release.
         </p>
       </div>
 

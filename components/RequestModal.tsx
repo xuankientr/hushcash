@@ -80,7 +80,7 @@ export function RequestModal({ onClose }: { onClose: () => void }) {
               </button>
 
               <p className="text-center text-[11px] text-white-4">
-                Private transactions via ArcaneVM · <span className="text-white-4">coming soon</span>
+                Private transactions via Arc Privacy · <span className="text-white-4">coming soon</span>
               </p>
             </>
           ) : (

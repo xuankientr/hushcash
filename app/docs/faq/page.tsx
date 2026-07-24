@@ -15,7 +15,7 @@ const faqs = [
   },
   {
     q: 'Is my identity hidden on-chain?',
-    a: 'Partially. HushCash hides identities in the app UI — senders and recipients see wallet addresses, not names. However, on-chain transactions on Arc Testnet are public. Full cryptographic privacy via ArcaneVM is coming in a future release.',
+    a: 'Partially. HushCash hides identities in the app UI — senders and recipients see wallet addresses, not names. However, on-chain transactions on Arc Testnet are public. Full cryptographic privacy via Arc Privacy is coming in a future release.',
   },
   {
     q: 'What fees does HushCash charge?',
@@ -52,8 +52,8 @@ export default function FaqPage() {
       </div>
 
       <div className="pt-2 border-t border-white/[0.06] flex justify-between">
-        <Link href="/docs/arcanevm" className="flex items-center gap-1.5 text-[13px] text-white-3 hover:text-white transition-colors">
-          <span>←</span> ArcaneVM
+        <Link href="/docs/arc-privacy" className="flex items-center gap-1.5 text-[13px] text-white-3 hover:text-white transition-colors">
+          <span>←</span> Arc Privacy
         </Link>
         <Link href="/docs/fees" className="flex items-center gap-1.5 text-[13px] text-white-3 hover:text-white transition-colors">
           Fees <span>→</span>

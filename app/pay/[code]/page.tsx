@@ -18,7 +18,7 @@ export default async function PayPage({ params }: { params: Promise<{ code: stri
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo.png" alt="HushCash" width={40} height={40} className="rounded-xl mb-3" />
           <h1 className="text-lg font-bold text-white">Payment Request</h1>
-          <p className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.4)" }}>Private payments via ArcaneVM · coming soon</p>
+          <p className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.4)" }}>Private payments via Arc Privacy · coming soon</p>
         </div>
         <PayWidget request={request} />
       </div>

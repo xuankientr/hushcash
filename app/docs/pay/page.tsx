@@ -156,7 +156,7 @@ export default function HushCashPayPage() {
               <p className="text-[12px] font-semibold text-gray-800">Private fields</p>
             </div>
             <p className="text-[12px] text-gray-500 leading-relaxed">
-              Encrypted and accessible only to sender and recipient. Typical choices: personal notes, customer identity, internal references. Cryptographic enforcement via ArcaneVM — coming soon.
+              Encrypted and accessible only to sender and recipient. Typical choices: personal notes, customer identity, internal references. Cryptographic enforcement via Arc Privacy — coming soon.
             </p>
           </div>
           <div className="p-4 rounded-2xl border border-primary/20 bg-blue-50 space-y-1">

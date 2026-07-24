@@ -101,7 +101,7 @@ export default function DocsPage() {
             'Native USDC on Arc — fast finality, near-zero fees.',
             'Non-custodial wallets powered by Circle.',
             'Drop Cash — claimable links backed by on-chain escrow.',
-            'On-chain privacy via ArcaneVM — coming soon.',
+            'On-chain privacy via Arc Privacy — coming soon.',
           ].map((item) => (
             <li
               key={item}

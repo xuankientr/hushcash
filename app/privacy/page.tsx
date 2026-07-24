@@ -51,7 +51,7 @@ export default function PrivacyPage() {
         <section className="space-y-2">
           <h2 className="text-sm font-semibold text-white">On-chain data</h2>
           <p className="text-sm text-white-3 leading-relaxed">
-            Transactions made through HushCash are recorded on Arc Testnet, a public blockchain. While HushCash hides recipient identities in the UI, on-chain transaction data (wallet addresses, amounts) is publicly visible. Full on-chain privacy via Arc&apos;s ArcaneVM is planned for a future release.
+            Transactions made through HushCash are recorded on Arc Testnet, a public blockchain. While HushCash hides recipient identities in the UI, on-chain transaction data (wallet addresses, amounts) is publicly visible. Full on-chain privacy via Arc Privacy is planned for a future release.
           </p>
         </section>
 
