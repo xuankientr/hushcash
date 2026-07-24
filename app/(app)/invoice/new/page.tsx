@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { usePrivy } from "@privy-io/react-auth";
 import {
   ArrowLeftIcon, CopyIcon, CheckIcon, ReceiptIcon,
-  CameraIcon, ImageIcon, XIcon, LinkIcon,
+  CameraIcon, ImageIcon, XIcon, LinkIcon, DownloadSimpleIcon,
 } from "@phosphor-icons/react";
 
 const inp = "w-full rounded-2xl px-4 py-3 text-sm text-white-2 placeholder:text-white-4/60 outline-none resize-none";
@@ -104,6 +104,18 @@ export default function NewInvoicePage() {
     await navigator.clipboard.writeText(result.url);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  }
+
+  async function handleDownloadQR() {
+    if (!result) return;
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&margin=16&data=${encodeURIComponent(result.url)}`;
+    const res = await fetch(qrUrl);
+    const blob = await res.blob();
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "invoice-qr.png";
+    a.click();
+    URL.revokeObjectURL(a.href);
   }
 
   return (
@@ -213,7 +225,7 @@ export default function NewInvoicePage() {
           </div>
         ) : (
           <div className="space-y-4">
-            <div className="hush-card p-5 text-center space-y-3">
+            <div className="hush-card p-5 text-center space-y-4">
               <div className="w-12 h-12 rounded-2xl bg-up/10 border border-up/20 flex items-center justify-center mx-auto">
                 <ReceiptIcon size={22} weight="duotone" className="text-up" />
               </div>
@@ -221,6 +233,17 @@ export default function NewInvoicePage() {
                 <p className="text-sm font-semibold text-white">Invoice created!</p>
                 <p className="text-xs text-white-4 mt-0.5">Share this link with your client</p>
               </div>
+
+              {/* QR code */}
+              <div className="flex justify-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=10&data=${encodeURIComponent(result.url)}`}
+                  alt="Invoice QR" width={180} height={180} className="rounded-2xl"
+                />
+              </div>
+
+              {/* Link row */}
               <div className="flex items-center gap-2 rounded-xl bg-white/[0.04] border border-white/[0.08] px-3 py-2.5">
                 <p className="flex-1 text-xs text-white-2 font-mono truncate text-left">{result.url}</p>
                 <button onClick={handleCopy}
@@ -228,6 +251,13 @@ export default function NewInvoicePage() {
                   {copied ? <CheckIcon size={12} weight="bold" className="text-up" /> : <CopyIcon size={12} />}
                 </button>
               </div>
+
+              {/* Download QR */}
+              <button onClick={handleDownloadQR}
+                className="w-full flex items-center justify-center gap-2 h-9 rounded-xl border border-white/[0.08] text-white-4 text-xs hover:text-white hover:border-white/[0.18] transition-all">
+                <DownloadSimpleIcon size={14} />
+                Download QR image
+              </button>
             </div>
             <button onClick={() => { setResult(null); setTitle(""); setDescription(""); setAmount(""); setProofNote(""); setProofPreview(null); setProofImageUrl(""); }}
               className="w-full h-10 rounded-2xl border border-white/[0.08] text-white-4 text-sm hover:text-white hover:bg-white/[0.04] transition-all">
