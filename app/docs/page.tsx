@@ -10,13 +10,13 @@ const cards = [
   {
     icon: '→',
     title: 'Send',
-    desc: 'Send USDC to any @username or wallet address.',
+    desc: 'Send USDC to any @username or wallet address. Scan a QR code to fill the recipient instantly.',
     href: '/docs/send',
   },
   {
     icon: '↗',
     title: 'Request',
-    desc: 'Generate a shareable payment link to request USDC from anyone.',
+    desc: 'Generate a shareable payment link. Optionally split a total between people with custom % or fixed amounts.',
     href: '/docs/request',
   },
   {
@@ -96,7 +96,8 @@ export default function DocsPage() {
         <ul className='space-y-2'>
           {[
             'No wallet required to pay — anyone can settle via a link.',
-            'Pay by @username or wallet address.',
+            'Pay by @username, wallet address, or QR scan.',
+            'Split a bill between people — each person gets their own link, custom % or fixed amount.',
             'Invoice with proof of work — photo, gallery upload, or URL.',
             'Native USDC on Arc — fast finality, near-zero fees.',
             'Non-custodial wallets powered by Circle.',

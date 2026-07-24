@@ -11,8 +11,8 @@ Private peer-to-peer payments on Arc. Send, request, invoice, and drop USDC — 
 HushCash is a non-custodial payments app built natively on Arc. Users sign in with email via Privy and get a Circle Developer Controlled Wallet created for them automatically — no seed phrases, no setup friction.
 ## Features
 
-- **Send** — Pay anyone by @username or wallet address
-- **Request** — Generate a shareable payment link; anyone can pay without an account
+- **Send** — Pay anyone by @username or wallet address; scan a QR code to fill the recipient instantly
+- **Request** — Generate a shareable payment link; optional split mode lets you divide a total between people with custom % or fixed USDC amounts per person
 - **Invoice** — Create an invoice with an amount, description, and proof of work (photo, gallery upload, or URL); share a link; payer settles in one tap
 - **Drop Cash** — Pre-load a claimable link backed by on-chain escrow; whoever has the link can claim the funds
 - **Username** — Claim a unique @handle; others can pay you by name instead of address
