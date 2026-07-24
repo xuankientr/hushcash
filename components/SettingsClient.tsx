@@ -172,16 +172,19 @@ function UsernameEditor({ current }: { current: string | null }) {
   }
 
   const statusColor = { idle: "", checking: "text-white-4", available: "text-green-400", taken: "text-red-400", invalid: "text-yellow-400" }[status];
-  const statusText = { idle: "", checking: "Checking...", available: "✓ Available", taken: "Already taken", invalid: "3–20 chars, letters/numbers/underscores" }[status];
+  const statusText = { idle: "", checking: "Checking...", available: "✓ Available", taken: "Already taken", invalid: "3–20 chars, letters/numbers/_" }[status];
 
   if (!editing) {
     return (
-      <div className="flex items-center gap-2">
-        <span className="text-base font-bold text-white">
-          {current ? `@${current}` : <span className="text-white-4 font-normal text-sm">No username set</span>}
-        </span>
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-[11px] text-white-4 mb-0.5">Username</p>
+          <p className="text-sm font-semibold text-white">
+            {current ? `@${current}` : <span className="text-white-4 font-normal">Not set</span>}
+          </p>
+        </div>
         <button onClick={() => { setEditing(true); setValue(current ?? ""); setStatus("idle"); }}
-          className="w-7 h-7 flex items-center justify-center rounded-full bg-white/[0.06] text-white-4 hover:text-white transition-colors">
+          className="w-8 h-8 flex items-center justify-center rounded-full bg-white/[0.06] text-white-4 hover:text-white transition-colors">
           <PencilSimpleIcon size={13} weight="bold" />
         </button>
       </div>
@@ -189,14 +192,15 @@ function UsernameEditor({ current }: { current: string | null }) {
   }
 
   return (
-    <div className="space-y-2 w-full">
+    <div className="space-y-2">
+      <p className="text-[11px] text-white-4">Username</p>
       <div className="flex items-center gap-2 h-10 px-3 rounded-xl bg-white/[0.04] border border-white/[0.10] focus-within:border-primary/50 transition-colors">
-        <span className="text-white-4 font-medium text-sm select-none">@</span>
+        <span className="text-white-4 text-sm select-none">@</span>
         <input autoFocus value={value}
           onChange={(e) => setValue(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))}
           maxLength={20} className="flex-1 bg-transparent text-white text-sm outline-none" />
       </div>
-      {statusText && <p className={`text-[11px] px-1 ${statusColor}`}>{statusText}</p>}
+      {statusText && <p className={`text-[11px] ${statusColor}`}>{statusText}</p>}
       <div className="flex gap-2">
         <button onClick={handleSave} disabled={status !== "available" || saving}
           className="flex-1 h-9 rounded-xl bg-primary text-white text-xs font-semibold hover:bg-primary-h transition-all disabled:opacity-40">
@@ -250,29 +254,25 @@ export function SettingsClient({ walletAddress, displayName, totalSent, totalRec
 
         {/* Profile */}
         <div className="hush-card p-4 space-y-3">
-          <div className="flex items-start justify-between gap-3">
-            {/* Avatar + username */}
-            <div className="flex items-center gap-3 flex-1 min-w-0">
-              <div className="w-10 h-10 rounded-full bg-primary/20 border border-primary/30 flex-shrink-0 flex items-center justify-center">
-                <span className="text-sm font-bold text-primary">
-                  {displayName ? displayName[0].toUpperCase() : "?"}
-                </span>
-              </div>
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex-1 min-w-0">
               <UsernameEditor current={displayName} />
             </div>
             <button onClick={handleLogout}
-              className="w-8 h-8 flex items-center justify-center rounded-full bg-down/10 text-down hover:bg-down/20 transition-colors flex-shrink-0">
+              className="w-8 h-8 flex items-center justify-center rounded-full bg-down/10 text-down hover:bg-down/20 transition-colors flex-shrink-0 mt-0.5">
               <SignOutIcon size={14} weight="bold" />
             </button>
           </div>
 
-          {/* Wallet address */}
           {walletAddress && (
-            <div className="flex items-center gap-2 bg-black/20 border border-white/[0.06] rounded-xl px-3 py-2">
-              <p className="flex-1 text-[11px] font-mono text-white-4 truncate">{walletAddress}</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[11px] text-white-4 mb-0.5">Wallet</p>
+                <p className="text-sm font-mono text-white-2">{shortenAddress(walletAddress)}</p>
+              </div>
               <button onClick={handleCopy}
-                className="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-lg text-white-4 hover:text-white transition-colors">
-                {copied ? <CheckIcon size={11} weight="bold" className="text-up" /> : <CopyIcon size={11} />}
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-white/[0.06] text-white-4 hover:text-white transition-colors">
+                {copied ? <CheckIcon size={13} weight="bold" className="text-up" /> : <CopyIcon size={13} />}
               </button>
             </div>
           )}
