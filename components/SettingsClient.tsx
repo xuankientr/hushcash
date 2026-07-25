@@ -10,6 +10,7 @@ import {
   PencilSimpleIcon,
 } from "@phosphor-icons/react";
 import { formatUsdc, shortenAddress, isValidUsername } from "@/lib/utils";
+import { markActivityRead } from "@/hooks/useUnreadCount";
 import { TransactionList } from "./TransactionList";
 
 type Tab = "wallet" | "activity";
@@ -228,13 +229,34 @@ function UsernameEditor({ current }: { current: string | null }) {
   );
 }
 
-export function SettingsClient({ walletAddress, displayName, totalSent, totalReceived, totalRequested, totalClaimed, transfers }: Props) {
+export function SettingsClient({ walletAddress, displayName, totalSent, totalReceived, totalRequested, totalClaimed, transfers: initialTransfers }: Props) {
   const [tab, setTab] = useState<Tab>("wallet");
   const [copied, setCopied] = useState(false);
   const [showDeposit, setShowDeposit] = useState(false);
   const [showWithdraw, setShowWithdraw] = useState(false);
+  const [transfers, setTransfers] = useState(initialTransfers);
+  const [syncing, setSyncing] = useState(false);
   const { logout } = usePrivy();
   const router = useRouter();
+
+  async function syncActivity() {
+    setSyncing(true);
+    try {
+      const res = await fetch("/api/transfer/sync", { method: "POST" });
+      if (res.ok) {
+        const data = await res.json();
+        setTransfers(data.transfers);
+      }
+    } catch { /* non-blocking */ } finally {
+      setSyncing(false);
+    }
+  }
+
+  function openActivityTab() {
+    setTab("activity");
+    markActivityRead();
+    syncActivity();
+  }
 
   const { data: balanceData } = useQuery({
     queryKey: ["balance"],
@@ -294,9 +316,9 @@ export function SettingsClient({ walletAddress, displayName, totalSent, totalRec
         {/* Tabs */}
         <div className="flex bg-black/30 rounded-2xl p-1 gap-1 border border-white/[0.06]">
           {(["wallet", "activity"] as Tab[]).map((t) => (
-            <button key={t} onClick={() => setTab(t)}
+            <button key={t} onClick={() => t === "activity" ? openActivityTab() : setTab(t)}
               className={`flex-1 py-2 rounded-xl text-xs font-medium capitalize transition-all ${tab === t ? "bg-white/[0.1] text-white" : "text-white-4 hover:text-white-2"}`}>
-              {t === "wallet" ? "Wallet" : "Activity"}
+              {t === "wallet" ? "Wallet" : syncing && tab === "activity" ? "Syncing…" : "Activity"}
             </button>
           ))}
         </div>

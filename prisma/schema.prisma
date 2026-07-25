@@ -34,6 +34,7 @@ model User {
   paymentRequests   PaymentRequest[]
   claimableLinks    ClaimableLink[]
   invoices          Invoice[]
+  contacts          Contact[]
 
   @@map("users")
 }
@@ -147,6 +148,20 @@ enum InvoiceStatus {
   PENDING
   PAID
   CANCELLED
+}
+
+model Contact {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  label     String   // display name e.g. "Mom", "Alice"
+  handle    String?  // @username
+  address   String?  // 0x wallet address
+
+  @@map("contacts")
 }
 
 model Waitlist {
