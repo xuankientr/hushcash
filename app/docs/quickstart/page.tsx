@@ -16,22 +16,27 @@ export default function QuickstartPage() {
           {
             step: 1,
             title: 'Sign in',
-            body: 'Go to hushcash.xyz and click Get started. Sign in with your X (Twitter) account or email via Privy. No password or seed phrase required.',
+            body: 'Go to hushcash.xyz and click Get started. Sign in with your email via Privy. No password, no seed phrase, no crypto wallet required.',
           },
           {
             step: 2,
             title: 'Your wallet is created',
-            body: 'HushCash automatically creates a non-custodial Arc wallet for you. You can find your wallet address on the Settings page.',
+            body: 'HushCash automatically creates a non-custodial Arc wallet for you. Your wallet address is visible on the Settings page.',
           },
           {
             step: 3,
             title: 'Deposit USDC',
-            body: 'Tap Deposit on the Settings page to see your wallet address. Send USDC on Arc Testnet to that address from any compatible wallet or faucet.',
+            body: 'Tap Deposit on the Settings page to see your wallet address and QR code. Send USDC on Arc Testnet to that address from any compatible wallet or faucet.',
           },
           {
             step: 4,
             title: 'Send your first payment',
-            body: 'Tap Send on the dashboard. Enter an X handle (e.g. @alice), a wallet address, or paste a HushCash pay link. Enter an amount and send.',
+            body: 'Tap Send on the dashboard. Enter a @username or wallet address — or tap the QR icon to scan a HushCash profile or wallet QR. Enter an amount and send.',
+          },
+          {
+            step: 5,
+            title: 'Save contacts',
+            body: 'After sending, tap "Save contact?" to remember the recipient with a name. Saved contacts appear as quick-fill chips the next time you open Send.',
           },
         ].map(({ step, title, body }) => (
           <div key={step} className="flex gap-4 p-4 rounded-2xl border border-white/[0.07] bg-white/[0.02]">
@@ -49,7 +54,7 @@ export default function QuickstartPage() {
       <div className="p-4 rounded-2xl border border-white/[0.07] bg-white/[0.02] space-y-1">
         <p className="text-[12px] font-semibold text-white-2">Testnet note</p>
         <p className="text-[12px] text-white-4 leading-relaxed">
-          HushCash is currently running on Arc Testnet. USDC used here is testnet currency and holds no real value. Get testnet USDC from the Arc faucet.
+          HushCash is currently running on Arc Testnet. USDC used here is testnet currency and holds no real value. Get testnet USDC from the <a href="https://faucet.testnet.arc.network" target="_blank" rel="noopener noreferrer" className="underline">Arc faucet</a>.
         </p>
       </div>
 

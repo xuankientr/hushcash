@@ -9,14 +9,17 @@ Private peer-to-peer payments on Arc. Send, request, invoice, and drop USDC — 
 ## Overview
 
 HushCash is a non-custodial payments app built natively on Arc. Users sign in with email via Privy and get a Circle Developer Controlled Wallet created for them automatically — no seed phrases, no setup friction.
+
 ## Features
 
-- **Send** — Pay anyone by @username or wallet address; scan a QR code to fill the recipient instantly
-- **Request** — Generate a shareable payment link; optional split mode lets you divide a total between people with custom % or fixed USDC amounts per person
-- **Invoice** — Create an invoice with an amount, description, and proof of work (photo, gallery upload, or URL); share a link; payer settles in one tap
-- **Drop Cash** — Pre-load a claimable link backed by on-chain escrow; whoever has the link can claim the funds
-- **Username** — Claim a unique @handle; others can pay you by name instead of address
-- **Settings** — View balance, activity history, deposit address, and withdraw to any wallet
+- **Send** — Pay anyone by @username or wallet address; scan a QR code to fill the recipient instantly; tap a saved contact for one-tap sending
+- **Request** — Generate a shareable payment link; optional split mode divides a total between people with custom % or fixed USDC amounts per person
+- **Invoice** — Create an invoice with title, amount, and proof of work (note, photo, or URL); share a link or QR code; client pays in one tap
+- **Drop Cash** — Pre-load a claimable link backed by on-chain escrow; whoever has the link can claim the funds — no account required
+- **Contacts** — Save frequent recipients as named contacts; appears as quick-fill chips in the Send flow; stored per account
+- **Notifications** — Badge on the Settings icon when new funds arrive; clears when the Activity tab is opened
+- **Wallet** — Deposit, withdraw, and track balance; Activity tab auto-syncs pending transactions with the network on open
+- **Username** — Claim a unique @handle; others can pay you by name or scan your profile QR
 
 ## Smart Contracts
 
@@ -65,8 +68,9 @@ app/
   (app)/          # Authenticated pages (dashboard, settings, invoice/new)
   invoice/[code]/ # Public invoice page
   pay/[code]/     # Public pay-request page
-  api/            # API routes (transfer, invoice, drop, user, wallet)
+  api/            # API routes (transfer, invoice, drop, contacts, activity, wallet)
 components/       # React UI components
+hooks/            # Client-side hooks (useUnreadCount)
 lib/              # Circle, Privy, Prisma clients + utilities
 prisma/           # Database schema
 contracts/        # Solidity contracts + Hardhat config

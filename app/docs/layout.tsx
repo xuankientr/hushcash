@@ -15,7 +15,9 @@ const nav = [
     items: [
       { label: 'Send', href: '/docs/send' },
       { label: 'Request', href: '/docs/request' },
+      { label: 'Invoice', href: '/docs/invoice' },
       { label: 'Drop Cash', href: '/docs/drop' },
+      { label: 'Contacts', href: '/docs/contacts' },
       { label: 'Wallet', href: '/docs/wallet' },
       { label: 'HushCash Pay', href: '/docs/pay' },
     ],
@@ -56,19 +58,12 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
               <ul className="space-y-0.5">
                 {items.map(({ label, href }) => (
                   <li key={href}>
-                    {href === '/docs' || href === '/docs/pay' ? (
-                      <Link
-                        href={href}
-                        className="block px-2 py-1.5 text-[13px] text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors"
-                      >
-                        {label}
-                      </Link>
-                    ) : (
-                      <span className="flex items-center justify-between px-2 py-1.5 text-[13px] text-gray-400 cursor-default select-none">
-                        {label}
-                        <span className="text-[10px] text-gray-300">soon</span>
-                      </span>
-                    )}
+                    <Link
+                      href={href}
+                      className="block px-2 py-1.5 text-[13px] text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors"
+                    >
+                      {label}
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -80,7 +75,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
           <a href="https://x.com/hushcash_xyz" target="_blank" rel="noopener noreferrer"
             className="flex items-center gap-1.5 text-[12px] text-gray-400 hover:text-gray-600 transition-colors">
             <XLogo size={13} weight="bold" />
-            X / Twitter
+            @hushcash_xyz
           </a>
         </div>
       </aside>

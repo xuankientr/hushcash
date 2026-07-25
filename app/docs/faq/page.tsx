@@ -3,31 +3,39 @@ import Link from 'next/link';
 const faqs = [
   {
     q: 'Is HushCash on mainnet?',
-    a: 'No. HushCash currently runs on Arc Testnet. USDC used here is testnet currency with no real monetary value. Mainnet launch will be announced on our X account.',
+    a: 'No. HushCash currently runs on Arc Testnet. USDC used here is testnet currency with no real monetary value. Mainnet launch will be announced on our X account (@hushcash_xyz).',
   },
   {
     q: 'Do I need a crypto wallet to sign in?',
-    a: 'No. You can sign in with your X (Twitter) account or email. HushCash creates an Arc wallet for you automatically.',
+    a: 'No. You can sign in with your email. HushCash creates an Arc wallet for you automatically — no seed phrase or browser extension required.',
   },
   {
     q: 'Who controls my wallet keys?',
-    a: 'Your wallet is non-custodial and managed via Circle\'s Developer Controlled Wallets. Circle encrypts and stores key material — HushCash never has direct access to your private key.',
+    a: "Your wallet is non-custodial and managed via Circle's Developer Controlled Wallets. Circle encrypts and stores key material — HushCash never has direct access to your private key.",
   },
   {
     q: 'Is my identity hidden on-chain?',
-    a: 'Partially. HushCash hides identities in the app UI — senders and recipients see wallet addresses, not names. However, on-chain transactions on Arc Testnet are public. Full cryptographic privacy via Arc Privacy is coming in a future release.',
+    a: 'Partially. HushCash hides identities in the app UI — senders and recipients see wallet addresses, not names. On-chain transactions on Arc Testnet are currently public. Full cryptographic privacy via Arc Privacy is coming in a future release.',
   },
   {
     q: 'What fees does HushCash charge?',
-    a: 'HushCash currently charges no fees. Arc Testnet transactions use a small amount of USDC as gas, which is deducted from your wallet automatically.',
+    a: 'HushCash charges no platform fees. Arc Testnet transactions use a small amount of USDC as gas (~0.001 USDC), which is deducted from your wallet automatically.',
   },
   {
     q: 'What happens if a Drop Cash link is never claimed?',
-    a: 'Funds remain locked in the escrow wallet. You can cancel the link from your activity feed to reclaim the funds — this feature is coming soon.',
+    a: "Funds remain locked in the escrow wallet. You can cancel the link from your dashboard to reclaim the funds.",
   },
   {
-    q: 'Can I use HushCash without an X account?',
-    a: 'Yes. You can sign in with email. Note that pay links will show an anonymous avatar instead of your profile picture.',
+    q: 'What are contacts?',
+    a: 'Contacts let you save frequent recipients — @usernames or wallet addresses — with a friendly name. After a successful send, tap "Save contact?" to store them. They appear as quick-fill chips the next time you open Send.',
+  },
+  {
+    q: 'Why is a transaction showing as pending?',
+    a: 'Arc Testnet transactions are usually confirmed in seconds. If a transfer still shows pending after opening the Activity tab in Settings, tap it again — the tab automatically syncs with the network and updates the status.',
+  },
+  {
+    q: 'Can I split a bill with multiple people?',
+    a: 'Yes. In the Request modal, toggle "Split between people". Each person gets their own independent payment link. You can enter a fixed USDC amount or a percentage per person — no forced equal split.',
   },
 ];
 
