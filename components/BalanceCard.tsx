@@ -14,7 +14,9 @@ export function BalanceCard({ walletId }: { walletId?: string | null }) {
   const { data, isLoading, refetch, isFetching } = useQuery({
     queryKey: ['balance'],
     queryFn: () => fetch('/api/wallet/balance').then((r) => r.json()),
-    refetchInterval: 30000,
+    staleTime: 30_000,
+    refetchInterval: 30_000,
+    refetchOnWindowFocus: false,
   });
   const balance = data?.balance ?? '0';
 

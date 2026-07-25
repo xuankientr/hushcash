@@ -1,5 +1,7 @@
+import { cache } from "react";
 import { PrivyClient } from "@privy-io/server-auth";
 import { cookies } from "next/headers";
+import type { NextRequest } from "next/server";
 import { prisma } from "./prisma";
 import { createWalletForUser } from "./circle";
 
@@ -8,18 +10,19 @@ export const privyClient = new PrivyClient(
   process.env.PRIVY_APP_SECRET!,
 );
 
-export async function getAuthUser(req?: import("next/server").NextRequest) {
-  // Prefer Authorization header (sent by client for public pages like /pay)
-  let token: string | undefined;
+async function resolveToken(req?: NextRequest) {
   if (req) {
     const auth = req.headers.get("authorization");
-    if (auth?.startsWith("Bearer ")) token = auth.slice(7);
+    if (auth?.startsWith("Bearer ")) return auth.slice(7);
   }
-  // Fall back to cookie (works inside (app) layout)
-  if (!token) {
-    const cookieStore = await cookies();
-    token = cookieStore.get("privy-token")?.value;
-  }
+  const cookieStore = await cookies();
+  return cookieStore.get("privy-token")?.value;
+}
+
+// cache() deduplicates within a single request — layout + page both calling
+// this only pays one Privy verify + one DB query total.
+export const getAuthUser = cache(async (req?: NextRequest) => {
+  const token = await resolveToken(req);
   if (!token) return null;
   let claims;
   try {
@@ -28,18 +31,10 @@ export async function getAuthUser(req?: import("next/server").NextRequest) {
     return null;
   }
   return prisma.user.findUnique({ where: { privyDid: claims.userId } });
-}
+});
 
-export async function getOrCreateAuthUser(req?: import("next/server").NextRequest) {
-  let token: string | undefined;
-  if (req) {
-    const auth = req.headers.get("authorization");
-    if (auth?.startsWith("Bearer ")) token = auth.slice(7);
-  }
-  if (!token) {
-    const cookieStore = await cookies();
-    token = cookieStore.get("privy-token")?.value;
-  }
+export const getOrCreateAuthUser = cache(async (req?: NextRequest) => {
+  const token = await resolveToken(req);
   if (!token) return null;
 
   let claims;
@@ -49,7 +44,6 @@ export async function getOrCreateAuthUser(req?: import("next/server").NextReques
     return null;
   }
 
-  // Existing user fast path
   const existing = await prisma.user.findUnique({ where: { privyDid: claims.userId } });
   if (existing) {
     if (!existing.walletId) {
@@ -67,11 +61,12 @@ export async function getOrCreateAuthUser(req?: import("next/server").NextReques
     return existing;
   }
 
-  // First login — fetch Privy user details
-  const privyUser = await privyClient.getUser(claims.userId);
-  const twitter = privyUser.linkedAccounts.find((a) => a.type === "twitter_oauth") as
-    | { subject?: string; username?: string; name?: string; profilePictureUrl?: string }
-    | undefined;
+  // First login
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const privyUser = await (privyClient.getUser as any)(claims.userId);
+  const twitter = privyUser?.linkedAccounts?.find(
+    (a: { type: string }) => a.type === "twitter_oauth",
+  ) as { subject?: string; username?: string; name?: string; profilePictureUrl?: string } | undefined;
 
   let user;
   try {
@@ -85,14 +80,12 @@ export async function getOrCreateAuthUser(req?: import("next/server").NextReques
       },
     });
   } catch (e: unknown) {
-    // Concurrent requests both tried to create — return the one that won
     if ((e as { code?: string }).code === "P2002") {
       return prisma.user.findUnique({ where: { privyDid: claims.userId } });
     }
     throw e;
   }
 
-  // Create Circle wallet in background (non-blocking)
   createWalletForUser(user.id)
     .then((wallet) => {
       if (wallet?.id) {
@@ -105,4 +98,4 @@ export async function getOrCreateAuthUser(req?: import("next/server").NextReques
     .catch(console.error);
 
   return user;
-}
+});

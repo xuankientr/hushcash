@@ -2,7 +2,6 @@ import { getOrCreateAuthUser } from "@/lib/privy-server";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { SettingsClient } from "@/components/SettingsClient";
-import { getTransactionDetails } from "@/lib/circle";
 
 export default async function SettingsPage() {
   const user = await getOrCreateAuthUser();
@@ -18,26 +17,20 @@ export default async function SettingsPage() {
         where: { OR: [{ senderId: user.id }, { receiverId: user.id }] },
         orderBy: { createdAt: "desc" },
         take: 20,
-        select: { id: true, createdAt: true, amountUsdc: true, note: true, toAddress: true, status: true, senderId: true, txHash: true, circleTransferId: true },
+        select: {
+          id: true, createdAt: true, amountUsdc: true, note: true,
+          toAddress: true, status: true, senderId: true, txHash: true,
+        },
       }),
     ]);
 
   const sum = (rows: { amountUsdc: string | null }[]) =>
     rows.reduce((acc, r) => acc + parseFloat(r.amountUsdc ?? "0"), 0).toFixed(2);
 
-  // Enrich pending transfers with txHash from Circle
-  const enriched = await Promise.all(recentActivity.map(async (t) => {
-    let txHash = t.txHash;
-    if (!txHash && t.circleTransferId) {
-      try {
-        const details = await getTransactionDetails(t.circleTransferId);
-        if (details.txHash) {
-          txHash = details.txHash;
-          await prisma.transfer.update({ where: { id: t.id }, data: { txHash, status: details.state === "COMPLETE" ? "COMPLETE" : t.status } });
-        }
-      } catch { /* non-blocking */ }
-    }
-    return { ...t, txHash, status: t.status.toString(), direction: t.senderId === user.id ? "sent" as const : "received" as const };
+  const transfers = recentActivity.map((t) => ({
+    ...t,
+    status: t.status.toString(),
+    direction: t.senderId === user.id ? "sent" as const : "received" as const,
   }));
 
   return (
@@ -48,7 +41,7 @@ export default async function SettingsPage() {
       totalReceived={sum(receivedTransfers)}
       totalRequested={sum(paymentRequests)}
       totalClaimed={sum(claimableLinks)}
-      transfers={enriched}
+      transfers={transfers}
     />
   );
 }
