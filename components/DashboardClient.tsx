@@ -65,6 +65,17 @@ export function DashboardClient({
           </button>
         </div>
 
+        {/* Plug banner */}
+        <a
+          href="/plug"
+          className="flex items-center gap-2.5 px-4 py-2.5 rounded-2xl border border-up/20 bg-up/[0.06] hover:bg-up/[0.10] transition-colors group"
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-up flex-shrink-0" />
+          <span className="text-[13px] font-semibold text-up">The Plug</span>
+          <span className="text-[13px] text-up/60 flex-1">Embed private payments</span>
+          <span className="text-up/50 group-hover:text-up/80 transition-colors text-sm">→</span>
+        </a>
+
         {/* Activity */}
         <TransactionList transfers={transfers} />
       </div>
