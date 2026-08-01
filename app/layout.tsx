@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     siteName: 'HushCash',
     images: [
       {
-        url: '/earlyaccess.png',
+        url: '/hushcashnowlive.png',
         width: 1200,
         height: 630,
       },
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'HushCash',
     description: 'Private payments on Arc.',
-    images: ['/earlyaccess.png'],
+    images: ['/hushcashnowlive.png'],
   },
 };
 

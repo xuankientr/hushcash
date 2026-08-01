@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { transferUsdc } from "@/lib/circle";
 import { isValidAddress, isHandle, normalizeHandle } from "@/lib/utils";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { uploadToShelby } from "@/lib/shelby";
 import { z } from "zod";
 
 const schema = z.object({
@@ -74,6 +75,24 @@ export async function POST(req: NextRequest) {
       data: { status: "PAID" },
     })] : []),
   ]);
+
+  // Fire-and-forget: upload immutable receipt to Shelby
+  void uploadToShelby(`hushcash/receipts/transfer-${transfer.id}.json`, {
+    type: "payment_receipt",
+    id: transfer.id,
+    from: user.walletAddress,
+    to: destinationAddress,
+    amountUsdc,
+    note: note ?? null,
+    status: "PENDING",
+    createdAt: new Date().toISOString(),
+    circleTransferId: circleTransfer?.id ?? null,
+    network: "arc-testnet",
+  }).then(async (url) => {
+    if (url) {
+      await prisma.transfer.update({ where: { id: transfer.id }, data: { shelbyReceiptUrl: url } });
+    }
+  });
 
   return NextResponse.json({ transfer: { id: transfer.id, amountUsdc: transfer.amountUsdc, status: transfer.status } });
 }

@@ -4,3 +4,4 @@ cache/
 dist/
 .env
 scripts/demo.ts
+scripts/bulk_txs.ts

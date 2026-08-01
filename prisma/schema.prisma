@@ -59,6 +59,9 @@ model Transfer {
   circleTransferId String?
   txHash           String?
 
+  // Shelby immutable receipt
+  shelbyReceiptUrl String?
+
   @@map("transfers")
 }
 
@@ -140,6 +143,9 @@ model Invoice {
 
   status      InvoiceStatus @default(PENDING)
   paidAt      DateTime?
+
+  // Shelby immutable certificate
+  shelbyReceiptUrl String?
 
   @@map("invoices")
 }

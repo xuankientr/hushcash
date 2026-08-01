@@ -31,7 +31,8 @@ export function TransactionList({ transfers }: { transfers: Transfer[] }) {
       <p className='text-[11px] text-white-4 font-medium tracking-wider uppercase mb-3 px-0.5'>
         Recent activity
       </p>
-      <div className='hush-card overflow-hidden divide-y divide-white/[0.04]'>
+      <div className='hush-card overflow-hidden'>
+      <div className='max-h-[480px] overflow-y-auto divide-y divide-white/[0.04]'>
         {transfers.map((t) => (
           <div key={t.id} className='relative flex items-center gap-3.5 px-4 py-3.5 hover:bg-white/[0.02] transition-colors'>
             {t.txHash && (
@@ -75,6 +76,7 @@ export function TransactionList({ transfers }: { transfers: Transfer[] }) {
             </div>
           </div>
         ))}
+      </div>
       </div>
     </div>
   );
