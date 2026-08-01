@@ -225,7 +225,7 @@ export default function PlugPlayground() {
                 className="flex items-center gap-2.5 px-5 py-3 bg-primary hover:bg-primary-h text-white text-sm font-semibold rounded-xl transition-all shadow-lg shadow-primary/20 active:scale-[0.97]"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/logo.png" alt="" width={16} height={16} className="rounded" />
+                <img src="/logo.png" alt="" width={22} height={22} className="rounded-md" />
                 {cfg.label || "Pay with HushCash"}
               </button>
             </div>
