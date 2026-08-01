@@ -6,9 +6,11 @@ import { CopyIcon, CheckIcon, ArrowSquareOutIcon } from "@phosphor-icons/react";
 type Cfg = { to: string; amount: string; note: string; label: string };
 type Tab = "script" | "react";
 
+const DEMO_ADDRESS = "0x0000000000000000000000000000000000000001";
+
 function buildPopupUrl(cfg: Cfg) {
   const p = new URLSearchParams();
-  p.set("to", cfg.to || "@demo");
+  p.set("to", cfg.to || DEMO_ADDRESS);
   if (cfg.amount) p.set("amount", cfg.amount);
   if (cfg.note) p.set("note", cfg.note);
   return `/plug/pay?${p.toString()}`;
@@ -36,7 +38,7 @@ function openPlug(url: string, onSuccess: (d: Record<string, unknown>) => void) 
 }
 
 function snippet(tab: Tab, cfg: Cfg) {
-  const to = cfg.to || "@alice";
+  const to = cfg.to || DEMO_ADDRESS;
   const label = cfg.label || "Pay with HushCash";
   if (tab === "script") {
     const attrs = [
@@ -66,7 +68,7 @@ const inp =
 
 export default function PlugPlayground() {
   const [cfg, setCfg] = useState<Cfg>({
-    to: "@alice",
+    to: "",
     amount: "",
     note: "",
     label: "Pay with HushCash",
@@ -123,7 +125,7 @@ export default function PlugPlayground() {
               <input
                 value={cfg.to}
                 onChange={(e) => setCfg((c) => ({ ...c, to: e.target.value }))}
-                placeholder="@username or 0x wallet address"
+                placeholder="0x wallet address"
                 className={inp}
               />
             </div>
