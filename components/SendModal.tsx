@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   ArrowUpRightIcon, XIcon, ArrowLeftIcon, CheckCircleIcon,
   AtIcon, WalletIcon, QrCodeIcon, CameraIcon,
-  StarIcon, PlusIcon, TrashIcon,
+  StarIcon, PlusIcon, TrashIcon, LockSimpleIcon,
 } from "@phosphor-icons/react";
 
 const KEYS = [["1","2","3"],["4","5","6"],["7","8","9"],[".","0","⌫"]];
@@ -29,6 +29,7 @@ export function SendModal({ onClose }: { onClose: () => void }) {
   const [note, setNote]       = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState("");
+  const [isPrivate, setIsPrivate] = useState(false);
   const [lastSentTo, setLastSentTo] = useState<{ value: string; mode: Mode } | null>(null);
 
   // QR scanner
@@ -112,7 +113,8 @@ export function SendModal({ onClose }: { onClose: () => void }) {
   async function handleSend() {
     setError(""); setLoading(true);
     const toValue = mode === "handle" && !to.startsWith("@") ? `@${to}` : to;
-    const res = await fetch("/api/transfer", {
+    const endpoint = isPrivate ? "/api/private-transfer" : "/api/transfer";
+    const res = await fetch(endpoint, {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ to: toValue, amountUsdc: amount, note }),
     });
@@ -328,6 +330,29 @@ export function SendModal({ onClose }: { onClose: () => void }) {
                 placeholder="Note (optional)" maxLength={200}
                 className="w-full rounded-2xl px-4 py-3 text-sm text-white-2 placeholder:text-white-4/50 outline-none" />
 
+              {/* Private toggle */}
+              <button
+                onClick={() => { setIsPrivate(p => !p); if (!isPrivate) setMode("handle"); }}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl border transition-all ${
+                  isPrivate
+                    ? "border-up/30 bg-up/[0.07]"
+                    : "border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.04]"
+                }`}
+              >
+                <LockSimpleIcon size={14} weight={isPrivate ? "fill" : "regular"} className={isPrivate ? "text-up" : "text-white-4"} />
+                <div className="flex-1 text-left">
+                  <p className={`text-xs font-semibold ${isPrivate ? "text-up" : "text-white-3"}`}>
+                    {isPrivate ? "Private transfer (ZK)" : "Send privately"}
+                  </p>
+                  {isPrivate && (
+                    <p className="text-[11px] text-up/60 mt-0.5">Zero-knowledge · via Unlink on Arc</p>
+                  )}
+                </div>
+                <div className={`w-9 h-5 rounded-full transition-colors relative ${isPrivate ? "bg-up" : "bg-white/[0.1]"}`}>
+                  <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all ${isPrivate ? "left-[18px]" : "left-0.5"}`} />
+                </div>
+              </button>
+
               {error && (
                 <div className="rounded-xl bg-down/10 border border-down/20 px-4 py-2.5">
                   <p className="text-xs text-down">{error}</p>
@@ -335,12 +360,12 @@ export function SendModal({ onClose }: { onClose: () => void }) {
               )}
 
               <button onClick={handleSend} disabled={!to || loading || scanning}
-                className="w-full h-12 rounded-2xl bg-white text-black text-sm font-semibold hover:bg-white/90 transition-all disabled:opacity-30">
-                {loading ? "Sending..." : "Send"}
+                className={`w-full h-12 rounded-2xl text-sm font-semibold transition-all disabled:opacity-30 flex items-center justify-center gap-2 ${
+                  isPrivate ? "bg-up hover:bg-up/90 text-white" : "bg-white hover:bg-white/90 text-black"
+                }`}>
+                {isPrivate && <LockSimpleIcon size={14} weight="fill" />}
+                {loading ? "Sending..." : isPrivate ? "Send privately" : "Send"}
               </button>
-              <p className="text-center text-[11px] text-white-4/60">
-                Private transactions via Arc Privacy · <span className="text-white-4">coming soon</span>
-              </p>
             </div>
           </>
         )}

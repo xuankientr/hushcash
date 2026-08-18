@@ -28,6 +28,10 @@ model User {
   walletId      String?  @unique
   walletAddress String?  @unique
 
+  // Unlink private wallet
+  unlinkAddress  String?  @unique
+  unlinkMnemonic String?
+
   // Relations
   sentTransfers     Transfer[]       @relation("SentTransfers")
   receivedTransfers Transfer[]       @relation("ReceivedTransfers")
@@ -61,6 +65,10 @@ model Transfer {
 
   // Shelby immutable receipt
   shelbyReceiptUrl String?
+
+  // Private transfer via Unlink
+  isPrivate    Boolean @default(false)
+  unlinkTxId   String?
 
   @@map("transfers")
 }
