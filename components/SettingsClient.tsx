@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import { usePrivy } from "@privy-io/react-auth";
+import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -33,18 +33,63 @@ interface Props {
 }
 
 function DepositModal({ walletAddress, onClose }: { walletAddress: string | null; onClose: () => void }) {
+  const { wallets } = useWallets();
   const [copied, setCopied] = useState(false);
+  const [amount, setAmount]   = useState("");
+  const [status, setStatus]   = useState<"idle" | "switching" | "sending" | "success" | "error">("idle");
+  const [txHash, setTxHash]   = useState("");
+  const [errMsg, setErrMsg]   = useState("");
+
+  const externalWallet = wallets.find((w: { walletClientType: string }) => w.walletClientType !== "privy");
+
+  const ARC_CHAIN_ID = "0x4CEDD2";
+  const ARC_PARAMS = {
+    chainId: ARC_CHAIN_ID, chainName: "Arc Testnet",
+    nativeCurrency: { name: "USDC", symbol: "USDC", decimals: 18 },
+    rpcUrls: ["https://rpc.testnet.arc.io"],
+    blockExplorerUrls: ["https://testnet.arcscan.app"],
+  };
+
   async function handleCopy() {
     if (!walletAddress) return;
     await navigator.clipboard.writeText(walletAddress);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
+
+  async function sendDeposit() {
+    if (!externalWallet || !walletAddress || !amount) return;
+    setStatus("switching"); setErrMsg("");
+    try {
+      const provider = await externalWallet.getEthereumProvider();
+      try {
+        await provider.request({ method: "wallet_switchEthereumChain", params: [{ chainId: ARC_CHAIN_ID }] });
+      } catch (e: unknown) {
+        if ((e as { code?: number })?.code === 4902)
+          await provider.request({ method: "wallet_addEthereumChain", params: [ARC_PARAMS] });
+        else throw e;
+      }
+      setStatus("sending");
+      const val = parseFloat(amount);
+      const hex = "0x" + BigInt(Math.round(val * 1e18)).toString(16);
+      const hash = (await provider.request({
+        method: "eth_sendTransaction",
+        params: [{ from: externalWallet.address, to: walletAddress, value: hex }],
+      })) as string;
+      setTxHash(hash); setStatus("success"); setAmount("");
+    } catch (e: unknown) {
+      const msg = (e as { message?: string })?.message ?? "Failed";
+      setErrMsg(msg.toLowerCase().includes("denied") || msg.toLowerCase().includes("rejected") ? "Transaction cancelled" : msg);
+      setStatus("error");
+    }
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
       <div className="relative w-full max-w-sm bg-card rounded-t-3xl sm:rounded-3xl border border-white/[0.08]"
         style={{ boxShadow: "0 -8px 48px rgba(0,0,0,0.6)" }}>
+
         <div className="flex items-center justify-between px-5 pt-5 pb-4">
           <div className="flex items-center gap-2 text-white font-semibold">
             <ArrowDownIcon size={16} weight="bold" />
@@ -54,26 +99,73 @@ function DepositModal({ walletAddress, onClose }: { walletAddress: string | null
             <XIcon size={14} weight="bold" />
           </button>
         </div>
-        <div className="px-5 space-y-3" style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom))' }}>
-          <p className="text-xs text-white-4 leading-relaxed">
-            Send USDC to your wallet address on <span className="text-white-3">Arc Testnet</span>.
-          </p>
-          {walletAddress && (
-            <div className="flex justify-center py-2">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=160x160&margin=8&data=${encodeURIComponent(walletAddress)}`}
-                alt="Wallet QR"
-                width={160}
-                height={160}
-                className="rounded-2xl"
-              />
+
+        <div className="px-5 space-y-3" style={{ paddingBottom: "max(1.25rem, env(safe-area-inset-bottom))" }}>
+
+          {/* Success */}
+          {status === "success" && (
+            <div className="rounded-2xl p-3 space-y-1" style={{ background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.18)" }}>
+              <div className="flex items-center gap-2">
+                <CheckIcon size={13} weight="bold" className="text-up" />
+                <p className="text-sm font-semibold text-up">Deposit sent!</p>
+              </div>
+              {txHash && (
+                <a href={`https://testnet.arcscan.app/tx/${txHash}`} target="_blank" rel="noopener noreferrer"
+                  className="text-[11px] font-mono text-up/60 hover:text-up/80 underline break-all">
+                  {txHash.slice(0, 18)}…{txHash.slice(-6)}
+                </a>
+              )}
             </div>
           )}
+
+          {/* Error */}
+          {status === "error" && errMsg && (
+            <div className="rounded-xl px-3 py-2 text-xs text-down" style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.18)" }}>
+              {errMsg}
+            </div>
+          )}
+
+          {externalWallet ? (
+            <>
+              {/* Wallet badge */}
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                <div className="w-2 h-2 rounded-full bg-up" />
+                <p className="text-xs font-mono text-white-3 truncate flex-1">{externalWallet.address.slice(0, 8)}…{externalWallet.address.slice(-6)}</p>
+                <span className="text-[11px] text-white-4 capitalize">{externalWallet.walletClientType}</span>
+              </div>
+              {/* Amount input */}
+              <div className="relative">
+                <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)}
+                  placeholder="0.00" min="0.01" step="0.01"
+                  className="w-full bg-bg border border-line-2 rounded-2xl px-4 py-3 text-white-2 text-sm pr-16 outline-none focus:border-primary transition-colors" />
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-white-4 font-semibold">USDC</span>
+              </div>
+              <button onClick={sendDeposit} disabled={!amount || parseFloat(amount) <= 0 || status === "sending" || status === "switching"}
+                className="w-full flex items-center justify-center gap-2 h-12 rounded-2xl bg-up hover:bg-up/90 text-white text-sm font-semibold transition-all disabled:opacity-40">
+                <ArrowDownIcon size={14} weight="bold" />
+                {status === "switching" ? "Switching to Arc…" : status === "sending" ? "Confirm in wallet…" : amount ? `Deposit ${amount} USDC` : "Deposit"}
+              </button>
+            </>
+          ) : (
+            <>
+              <p className="text-xs text-white-4 leading-relaxed">
+                No wallet connected — get free testnet USDC from the faucet, or copy your address below.
+              </p>
+              <a href="https://faucet.circle.com" target="_blank" rel="noopener noreferrer"
+                className="w-full flex items-center justify-center gap-2 h-11 rounded-2xl border border-primary/30 text-primary text-sm font-semibold hover:bg-primary/10 transition-all">
+                Get testnet USDC ↗
+              </a>
+            </>
+          )}
+
+          {/* Divider + address */}
+          <div className="flex items-center gap-2">
+            <div className="flex-1 h-px bg-white/[0.06]" />
+            <span className="text-[11px] text-white-4">or copy address</span>
+            <div className="flex-1 h-px bg-white/[0.06]" />
+          </div>
           <div className="flex items-center gap-2 bg-black/30 border border-white/[0.07] rounded-2xl px-4 py-3">
-            <p className="flex-1 text-xs font-mono text-white-2 truncate">
-              {walletAddress ?? "Setting up wallet..."}
-            </p>
+            <p className="flex-1 text-xs font-mono text-white-2 truncate">{walletAddress ?? "Setting up…"}</p>
             <button onClick={handleCopy} className="flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-lg text-white-4 hover:text-white transition-colors">
               {copied ? <CheckIcon size={13} weight="bold" className="text-up" /> : <CopyIcon size={13} />}
             </button>
