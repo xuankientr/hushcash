@@ -30,8 +30,7 @@
     "viem": "^2.21.54",
     "wagmi": "^2.13.5",
     "zod": "^3.24.1",
-    "@unlink-xyz/sdk": "canary",
-    "ethers": "^6.13.0"
+    "@unlink-xyz/sdk": "canary"
   },
   "devDependencies": {
     "@types/node": "^20",

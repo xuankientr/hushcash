@@ -36,10 +36,12 @@ async function buildClient(mnemonic: string) {
 
 /** Generate a fresh BIP39 mnemonic for a new user Unlink account */
 export function generateMnemonic(): string {
-  // Use ethers v6 which is pulled in by Unlink SDK
+  // @scure/bip39 is a dependency of @unlink-xyz/sdk
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { Wallet } = require("ethers");
-  return Wallet.createRandom().mnemonic.phrase as string;
+  const { generateMnemonic: gen } = require("@scure/bip39");
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { wordlist } = require("@scure/bip39/wordlists/english");
+  return gen(wordlist) as string;
 }
 
 /** Get the unlink1... address for a mnemonic (used to register new user) */
