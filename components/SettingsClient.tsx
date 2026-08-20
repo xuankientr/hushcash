@@ -182,23 +182,28 @@ function DepositModal({ walletAddress, onClose }: { walletAddress: string | null
 }
 
 function WithdrawModal({ onClose }: { onClose: () => void }) {
-  const [address, setAddress] = useState("");
+  const { wallets } = useWallets();
+  const [manualAddress, setManualAddress] = useState("");
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
 
+  const externalWallet = wallets.find((w: { walletClientType: string }) => w.walletClientType !== "privy");
+  const destination = externalWallet?.address ?? manualAddress;
+
   async function handleSubmit() {
+    if (!destination || !amount) return;
     setError(""); setLoading(true);
     const res = await fetch("/api/transfer", {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ to: address, amountUsdc: amount }),
+      body: JSON.stringify({ to: destination, amountUsdc: amount }),
     });
     const data = await res.json();
     setLoading(false);
     if (!res.ok) { setError(data.error ?? "Withdrawal failed"); return; }
     setSuccess(true);
-    setTimeout(() => onClose(), 2000);
+    setTimeout(() => onClose(), 2500);
   }
 
   return (
@@ -215,27 +220,48 @@ function WithdrawModal({ onClose }: { onClose: () => void }) {
             <XIcon size={14} weight="bold" />
           </button>
         </div>
-        <div className="px-5 space-y-3" style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom))' }}>
+        <div className="px-5 space-y-3" style={{ paddingBottom: "max(1.25rem, env(safe-area-inset-bottom))" }}>
           {success ? (
             <div className="py-6 text-center">
               <CheckCircleIcon size={40} weight="duotone" className="text-up mx-auto mb-3" />
               <p className="text-sm font-semibold text-white">Withdrawal initiated</p>
+              <p className="text-xs text-white-4 mt-1">USDC on its way to your wallet</p>
             </div>
           ) : (
             <>
-              <input value={address} onChange={(e) => setAddress(e.target.value)}
-                placeholder="Destination address (0x...)"
-                className="w-full rounded-2xl px-4 py-3 text-sm font-mono text-white-2 placeholder:text-white-4/50 outline-none" />
+              {externalWallet ? (
+                /* Wallet user — auto-fill destination */
+                <div className="flex items-center gap-2 px-3 py-2 rounded-xl"
+                  style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                  <div className="w-2 h-2 rounded-full bg-up flex-shrink-0" />
+                  <p className="text-xs text-white-3 font-mono truncate flex-1">
+                    {externalWallet.address.slice(0, 8)}…{externalWallet.address.slice(-6)}
+                  </p>
+                  <span className="text-[11px] text-white-4 capitalize">{externalWallet.walletClientType}</span>
+                </div>
+              ) : (
+                /* Email user — manual address entry */
+                <input value={manualAddress} onChange={(e) => setManualAddress(e.target.value)}
+                  placeholder="Destination address (0x...)"
+                  className="w-full rounded-2xl px-4 py-3 text-sm font-mono text-white-2 placeholder:text-white-4/50 outline-none" />
+              )}
+
               <div className="relative">
                 <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)}
                   placeholder="0.00" min="0.01" step="0.01"
-                  className="w-full rounded-2xl px-4 py-3 text-sm text-white-2 pr-16 outline-none" />
+                  className="w-full bg-bg border border-line-2 rounded-2xl px-4 py-3 text-white-2 text-sm pr-16 outline-none focus:border-primary transition-colors" />
                 <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-white-4 font-semibold">USDC</span>
               </div>
-              {error && <div className="rounded-xl bg-down/10 border border-down/20 px-4 py-2.5"><p className="text-xs text-down">{error}</p></div>}
-              <button onClick={handleSubmit} disabled={!address || !amount || loading}
+
+              {error && (
+                <div className="rounded-xl bg-down/10 border border-down/20 px-4 py-2.5">
+                  <p className="text-xs text-down">{error}</p>
+                </div>
+              )}
+
+              <button onClick={handleSubmit} disabled={!destination || !amount || parseFloat(amount) <= 0 || loading}
                 className="w-full h-12 rounded-2xl border border-white/[0.12] text-white text-sm font-semibold hover:bg-white/[0.05] transition-all disabled:opacity-30">
-                {loading ? "Processing..." : "Withdraw"}
+                {loading ? "Processing…" : amount ? `Withdraw ${amount} USDC` : "Withdraw"}
               </button>
             </>
           )}
