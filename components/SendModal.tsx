@@ -332,23 +332,23 @@ export function SendModal({ onClose }: { onClose: () => void }) {
 
               {/* Private toggle */}
               <button
-                onClick={() => { setIsPrivate(p => !p); if (!isPrivate) setMode("handle"); }}
+                onClick={() => setIsPrivate(p => !p)}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl border transition-all ${
                   isPrivate
-                    ? "border-up/30 bg-up/[0.07]"
+                    ? "border-primary/30 bg-primary/[0.06]"
                     : "border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.04]"
                 }`}
               >
-                <LockSimpleIcon size={14} weight={isPrivate ? "fill" : "regular"} className={isPrivate ? "text-up" : "text-white-4"} />
+                <LockSimpleIcon size={14} weight={isPrivate ? "fill" : "regular"} className={isPrivate ? "text-primary" : "text-white-4"} />
                 <div className="flex-1 text-left">
-                  <p className={`text-xs font-semibold ${isPrivate ? "text-up" : "text-white-3"}`}>
-                    {isPrivate ? "Private transfer (ZK)" : "Send privately"}
+                  <p className={`text-xs font-semibold ${isPrivate ? "text-primary" : "text-white-3"}`}>
+                    Send privately
                   </p>
                   {isPrivate && (
-                    <p className="text-[11px] text-up/60 mt-0.5">Zero-knowledge · via Unlink on Arc</p>
+                    <p className="text-[11px] text-white-4 mt-0.5">Arc Privacy · coming soon</p>
                   )}
                 </div>
-                <div className={`w-9 h-5 rounded-full transition-colors relative ${isPrivate ? "bg-up" : "bg-white/[0.1]"}`}>
+                <div className={`w-9 h-5 rounded-full transition-colors relative ${isPrivate ? "bg-primary/40" : "bg-white/[0.1]"}`}>
                   <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all ${isPrivate ? "left-[18px]" : "left-0.5"}`} />
                 </div>
               </button>
@@ -359,12 +359,10 @@ export function SendModal({ onClose }: { onClose: () => void }) {
                 </div>
               )}
 
-              <button onClick={handleSend} disabled={!to || loading || scanning}
-                className={`w-full h-12 rounded-2xl text-sm font-semibold transition-all disabled:opacity-30 flex items-center justify-center gap-2 ${
-                  isPrivate ? "bg-up hover:bg-up/90 text-white" : "bg-white hover:bg-white/90 text-black"
-                }`}>
-                {isPrivate && <LockSimpleIcon size={14} weight="fill" />}
-                {loading ? "Sending..." : isPrivate ? "Send privately" : "Send"}
+              <button onClick={handleSend} disabled={!to || loading || scanning || isPrivate}
+                className="w-full h-12 rounded-2xl bg-white hover:bg-white/90 text-black text-sm font-semibold transition-all disabled:opacity-30 flex items-center justify-center gap-2">
+                <LockSimpleIcon size={14} weight="fill" className={isPrivate ? "opacity-50" : "hidden"} />
+                {loading ? "Sending..." : isPrivate ? "Coming soon" : "Send"}
               </button>
             </div>
           </>
