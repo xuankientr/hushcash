@@ -13,11 +13,11 @@ import { formatUsdc, shortenAddress, isValidUsername } from "@/lib/utils";
 import { markActivityRead } from "@/hooks/useUnreadCount";
 import { TransactionList } from "./TransactionList";
 
-const ARC_CHAIN_ID = "0x4CEDD2"; // Arc Testnet (chain reports this via eth_chainId)
+const ARC_CHAIN_ID = "0x4CEF52"; // Arc Testnet chain ID 5042002
 const ARC_PARAMS = {
   chainId: ARC_CHAIN_ID, chainName: "Arc Testnet",
   nativeCurrency: { name: "USDC", symbol: "USDC", decimals: 18 },
-  rpcUrls: ["https://rpc.testnet.arc.io"],
+  rpcUrls: ["https://rpc.testnet.arc.network"],
   blockExplorerUrls: ["https://testnet.arcscan.app"],
 };
 function usdcToWei(usdc: string): string {
