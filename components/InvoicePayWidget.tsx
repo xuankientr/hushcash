@@ -59,8 +59,8 @@ export function InvoicePayWidget({ invoiceCode, amountUsdc, walletAddress }: Pro
     setLoading(false);
     if (!res.ok) { setError(data.error ?? "Payment failed"); return; }
 
-    // Mark invoice as paid
-    await fetch(`/api/invoice/${invoiceCode}/pay`, { method: "POST" });
+    // Mark invoice paid — fire-and-forget so success shows immediately
+    void fetch(`/api/invoice/${invoiceCode}/pay`, { method: "POST" });
     setSuccess(true);
   }
 

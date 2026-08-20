@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { InvoicePayWidget } from "@/components/InvoicePayWidget";
+import { InvoiceStatusWatcher } from "@/components/InvoiceStatusWatcher";
 import { formatUsdc } from "@/lib/utils";
 
 export default async function InvoicePage({ params }: { params: Promise<{ code: string }> }) {
@@ -83,6 +84,9 @@ export default async function InvoicePage({ params }: { params: Promise<{ code: 
             walletAddress={invoice.creator.walletAddress}
           />
         )}
+
+        {/* Auto-redirect recipient when payment is received */}
+        {!isPaid && <InvoiceStatusWatcher invoiceCode={invoice.code} />}
 
         <p className="text-center text-[11px]" style={{ color: "rgba(255,255,255,0.2)" }}>
           Powered by HushCash · Private payments on Arc
