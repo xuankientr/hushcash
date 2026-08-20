@@ -13,7 +13,7 @@ import { formatUsdc, shortenAddress, isValidUsername } from "@/lib/utils";
 import { markActivityRead } from "@/hooks/useUnreadCount";
 import { TransactionList } from "./TransactionList";
 
-const ARC_CHAIN_ID = "0x4CEF52"; // 5042002
+const ARC_CHAIN_ID = "0x4CEDD2"; // Arc Testnet (chain reports this via eth_chainId)
 const ARC_PARAMS = {
   chainId: ARC_CHAIN_ID, chainName: "Arc Testnet",
   nativeCurrency: { name: "USDC", symbol: "USDC", decimals: 18 },
@@ -70,9 +70,10 @@ function DepositModal({ walletAddress, onClose }: { walletAddress: string | null
       try {
         await provider.request({ method: "wallet_switchEthereumChain", params: [{ chainId: ARC_CHAIN_ID }] });
       } catch (e: unknown) {
-        if ((e as { code?: number })?.code === 4902)
+        if ((e as { code?: number })?.code === 4902) {
           await provider.request({ method: "wallet_addEthereumChain", params: [ARC_PARAMS] });
-        else throw e;
+          await provider.request({ method: "wallet_switchEthereumChain", params: [{ chainId: ARC_CHAIN_ID }] });
+        } else throw e;
       }
       setStatus("sending");
       const hash = (await provider.request({
