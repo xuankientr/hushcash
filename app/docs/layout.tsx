@@ -40,19 +40,19 @@ const nav = [
 
 export default function DocsLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-white flex">
+    <div className="min-h-screen bg-bg flex">
       {/* Sidebar */}
-      <aside className="hidden md:flex flex-col w-56 flex-shrink-0 border-r border-gray-200 px-4 py-8 sticky top-0 h-screen overflow-y-auto bg-gray-50">
+      <aside className="hidden md:flex flex-col w-56 flex-shrink-0 border-r border-white/[0.07] px-4 py-8 sticky top-0 h-screen overflow-y-auto bg-white/[0.02]">
         <Link href="/" className="flex items-center gap-2 mb-8 px-2">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo.png" alt="HushCash" width={22} height={22} className="rounded-md" />
-          <span className="text-sm font-semibold text-gray-900">HushCash</span>
+          <span className="text-sm font-semibold text-white">HushCash</span>
         </Link>
 
         <nav className="space-y-5 flex-1">
           {nav.map(({ group, items }) => (
             <div key={group}>
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 px-2 mb-1.5">
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-white-4 px-2 mb-1.5">
                 {group}
               </p>
               <ul className="space-y-0.5">
@@ -60,7 +60,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
                   <li key={href}>
                     <Link
                       href={href}
-                      className="block px-2 py-1.5 text-[13px] text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors"
+                      className="block px-2 py-1.5 text-[13px] text-white-3 hover:text-white rounded-lg hover:bg-white/[0.06] transition-colors"
                     >
                       {label}
                     </Link>
@@ -73,7 +73,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
 
         <div className="mt-6 px-2">
           <a href="https://x.com/hushcash_xyz" target="_blank" rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-[12px] text-gray-400 hover:text-gray-600 transition-colors">
+            className="flex items-center gap-1.5 text-[12px] text-white-4 hover:text-white-3 transition-colors">
             <XLogo size={13} weight="bold" />
             @hushcash_xyz
           </a>

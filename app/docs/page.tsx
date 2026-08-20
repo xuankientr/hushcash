@@ -44,11 +44,11 @@ export default function DocsPage() {
     <div className='space-y-10'>
       {/* Header */}
       <div className='space-y-3'>
-        <p className='text-xs font-semibold uppercase tracking-widest text-gray-400'>
+        <p className='text-xs font-semibold uppercase tracking-widest text-white-4'>
           Introduction
         </p>
-        <h1 className='text-2xl font-bold text-gray-900'>HushCash</h1>
-        <p className='text-sm text-gray-600 leading-relaxed max-w-lg'>
+        <h1 className='text-2xl font-bold text-white'>HushCash</h1>
+        <p className='text-sm text-white-3 leading-relaxed max-w-lg'>
           Private peer-to-peer payments on Arc. Send, request, invoice, and drop USDC — with a wallet that sets itself up automatically.
         </p>
       </div>
@@ -56,22 +56,22 @@ export default function DocsPage() {
       {/* HushCash Pay — featured */}
       <Link
         href='/docs/pay'
-        className='group block p-5 rounded-2xl border border-primary/30 bg-blue-50 hover:bg-blue-100/70 hover:border-primary/50 transition-all'
+        className='group block p-5 rounded-2xl border border-primary/30 bg-primary/[0.08] hover:bg-primary/[0.12] hover:border-primary/50 transition-all'
       >
         <div className='flex items-start justify-between gap-4'>
           <div className='space-y-1.5'>
             <div className='flex items-center gap-2'>
               <span className='text-sm'>💳</span>
-              <p className='text-[13px] font-semibold text-gray-900'>HushCash Pay</p>
-              <span className='text-[10px] px-1.5 py-0.5 rounded-full bg-gray-200 text-gray-500 font-medium'>
+              <p className='text-[13px] font-semibold text-white'>HushCash Pay</p>
+              <span className='text-[10px] px-1.5 py-0.5 rounded-full bg-white/[0.08] text-white-4 font-medium'>
                 sandbox
               </span>
             </div>
-            <p className='text-[12px] text-gray-600 leading-relaxed max-w-sm'>
+            <p className='text-[12px] text-white-3 leading-relaxed max-w-sm'>
               Accept USDC payments directly — merchants, freelancers, and businesses. Scan a QR or enter an address. Prices shown in VND.
             </p>
           </div>
-          <span className='text-gray-400 group-hover:text-gray-700 transition-colors text-sm flex-shrink-0 mt-0.5'>→</span>
+          <span className='text-white-4 group-hover:text-white transition-colors text-sm flex-shrink-0 mt-0.5'>→</span>
         </div>
       </Link>
 
@@ -79,19 +79,19 @@ export default function DocsPage() {
       <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
         {cards.map(({ icon, title, desc, href }) => (
           <Link key={href} href={href}
-            className='block p-4 rounded-2xl border border-gray-200 bg-gray-50 hover:bg-gray-100 hover:border-gray-300 transition-all'>
+            className='block p-4 rounded-2xl border border-white/[0.07] bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/[0.12] transition-all'>
             <div className='flex items-center gap-2 mb-2'>
               <span className='text-base'>{icon}</span>
-              <p className='text-[13px] font-semibold text-gray-800'>{title}</p>
+              <p className='text-[13px] font-semibold text-white'>{title}</p>
             </div>
-            <p className='text-[12px] text-gray-500 leading-relaxed'>{desc}</p>
+            <p className='text-[12px] text-white-3 leading-relaxed'>{desc}</p>
           </Link>
         ))}
       </div>
 
       {/* Why HushCash */}
       <div className='space-y-3'>
-        <h2 className='text-base font-semibold text-gray-900'>Why HushCash</h2>
+        <h2 className='text-base font-semibold text-white'>Why HushCash</h2>
         <ul className='space-y-2'>
           {[
             'No wallet required to pay — anyone can settle via a link.',
@@ -106,8 +106,8 @@ export default function DocsPage() {
             'Drop Cash — claimable links backed by on-chain escrow.',
             'On-chain privacy via Arc Privacy — coming soon.',
           ].map((item) => (
-            <li key={item} className='flex items-start gap-2.5 text-sm text-gray-600'>
-              <span className='text-gray-300 mt-0.5 flex-shrink-0'>—</span>
+            <li key={item} className='flex items-start gap-2.5 text-sm text-white-3'>
+              <span className='text-white-4 mt-0.5 flex-shrink-0'>—</span>
               {item}
             </li>
           ))}
@@ -116,7 +116,7 @@ export default function DocsPage() {
 
       {/* How it works */}
       <div className='space-y-3'>
-        <h2 className='text-base font-semibold text-gray-900'>How it works</h2>
+        <h2 className='text-base font-semibold text-white'>How it works</h2>
         <ol className='space-y-3'>
           {[
             ['Sign in', 'Connect with your email via Privy. No password or seed phrase required.'],
@@ -125,12 +125,12 @@ export default function DocsPage() {
             ['Send, request, or invoice', 'Pay by @username, wallet address, QR scan, or link. Split bills, create invoices with proof of work, or drop claimable links.'],
           ].map(([step, desc], i) => (
             <li key={step} className='flex gap-3.5'>
-              <span className='w-5 h-5 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-[10px] font-semibold text-gray-500 flex-shrink-0 mt-0.5'>
+              <span className='w-5 h-5 rounded-full bg-white/[0.05] border border-white/[0.08] flex items-center justify-center text-[10px] font-semibold text-white-4 flex-shrink-0 mt-0.5'>
                 {i + 1}
               </span>
               <div>
-                <p className='text-[13px] font-semibold text-gray-800'>{step}</p>
-                <p className='text-[12px] text-gray-500 mt-0.5 leading-relaxed'>{desc}</p>
+                <p className='text-[13px] font-semibold text-white'>{step}</p>
+                <p className='text-[12px] text-white-3 mt-0.5 leading-relaxed'>{desc}</p>
               </div>
             </li>
           ))}
