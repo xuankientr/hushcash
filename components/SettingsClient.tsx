@@ -13,7 +13,7 @@ import { formatUsdc, shortenAddress, isValidUsername } from "@/lib/utils";
 import { markActivityRead } from "@/hooks/useUnreadCount";
 import { TransactionList } from "./TransactionList";
 
-const ARC_CHAIN_ID = "0x4CEDD2";
+const ARC_CHAIN_ID = "0x4CEF52"; // 5042002
 const ARC_PARAMS = {
   chainId: ARC_CHAIN_ID, chainName: "Arc Testnet",
   nativeCurrency: { name: "USDC", symbol: "USDC", decimals: 18 },
