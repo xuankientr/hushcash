@@ -113,8 +113,7 @@ export function SendModal({ onClose }: { onClose: () => void }) {
   async function handleSend() {
     setError(""); setLoading(true);
     const toValue = mode === "handle" && !to.startsWith("@") ? `@${to}` : to;
-    const endpoint = isPrivate ? "/api/private-transfer" : "/api/transfer";
-    const res = await fetch(endpoint, {
+    const res = await fetch("/api/transfer", {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ to: toValue, amountUsdc: amount, note }),
     });
@@ -361,7 +360,7 @@ export function SendModal({ onClose }: { onClose: () => void }) {
 
               <button onClick={handleSend} disabled={!to || loading || scanning || isPrivate}
                 className="w-full h-12 rounded-2xl bg-white hover:bg-white/90 text-black text-sm font-semibold transition-all disabled:opacity-30 flex items-center justify-center gap-2">
-                <LockSimpleIcon size={14} weight="fill" className={isPrivate ? "opacity-50" : "hidden"} />
+                {isPrivate && <LockSimpleIcon size={14} weight="fill" className="opacity-50" />}
                 {loading ? "Sending..." : isPrivate ? "Coming soon" : "Send"}
               </button>
             </div>

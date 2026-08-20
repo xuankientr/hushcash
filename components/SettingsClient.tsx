@@ -13,6 +13,19 @@ import { formatUsdc, shortenAddress, isValidUsername } from "@/lib/utils";
 import { markActivityRead } from "@/hooks/useUnreadCount";
 import { TransactionList } from "./TransactionList";
 
+const ARC_CHAIN_ID = "0x4CEDD2";
+const ARC_PARAMS = {
+  chainId: ARC_CHAIN_ID, chainName: "Arc Testnet",
+  nativeCurrency: { name: "USDC", symbol: "USDC", decimals: 18 },
+  rpcUrls: ["https://rpc.testnet.arc.io"],
+  blockExplorerUrls: ["https://testnet.arcscan.app"],
+};
+function usdcToWei(usdc: string): string {
+  const val = parseFloat(usdc);
+  if (isNaN(val) || val <= 0) return "0x0";
+  return "0x" + BigInt(Math.round(val * 1e18)).toString(16);
+}
+
 type Tab = "wallet" | "activity";
 
 type Transfer = {
@@ -42,14 +55,6 @@ function DepositModal({ walletAddress, onClose }: { walletAddress: string | null
 
   const externalWallet = wallets.find((w: { walletClientType: string }) => w.walletClientType !== "privy");
 
-  const ARC_CHAIN_ID = "0x4CEDD2";
-  const ARC_PARAMS = {
-    chainId: ARC_CHAIN_ID, chainName: "Arc Testnet",
-    nativeCurrency: { name: "USDC", symbol: "USDC", decimals: 18 },
-    rpcUrls: ["https://rpc.testnet.arc.io"],
-    blockExplorerUrls: ["https://testnet.arcscan.app"],
-  };
-
   async function handleCopy() {
     if (!walletAddress) return;
     await navigator.clipboard.writeText(walletAddress);
@@ -70,11 +75,9 @@ function DepositModal({ walletAddress, onClose }: { walletAddress: string | null
         else throw e;
       }
       setStatus("sending");
-      const val = parseFloat(amount);
-      const hex = "0x" + BigInt(Math.round(val * 1e18)).toString(16);
       const hash = (await provider.request({
         method: "eth_sendTransaction",
-        params: [{ from: externalWallet.address, to: walletAddress, value: hex }],
+        params: [{ from: externalWallet.address, to: walletAddress, value: usdcToWei(amount) }],
       })) as string;
       setTxHash(hash); setStatus("success"); setAmount("");
     } catch (e: unknown) {
