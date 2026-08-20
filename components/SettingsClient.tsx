@@ -76,9 +76,10 @@ function DepositModal({ walletAddress, onClose }: { walletAddress: string | null
         } else throw e;
       }
       setStatus("sending");
+      const gasPrice = await provider.request({ method: "eth_gasPrice" }) as string;
       const hash = (await provider.request({
         method: "eth_sendTransaction",
-        params: [{ from: externalWallet.address, to: walletAddress, value: usdcToWei(amount) }],
+        params: [{ from: externalWallet.address, to: walletAddress, value: usdcToWei(amount), gas: "0x5208", gasPrice }],
       })) as string;
       setTxHash(hash); setStatus("success"); setAmount("");
     } catch (e: unknown) {
