@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getOrCreateAuthUser } from "@/lib/privy-server";
-import { BottomNav } from "@/components/BottomNav";
+import { AppNavigation } from "@/components/Sidebar";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const user = await getOrCreateAuthUser();
@@ -8,9 +8,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!user.username) redirect("/onboarding");
 
   return (
-    <div className="min-h-screen bg-bg">
-      <main className="pb-28">{children}</main>
-      <BottomNav />
+    <div className="min-h-screen bg-bg lg:flex">
+      <AppNavigation />
+      <main className="min-w-0 flex-1 pb-24 lg:pb-12">{children}</main>
     </div>
   );
 }

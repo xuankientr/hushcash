@@ -1,7 +1,7 @@
-import { formatUsdc, shortenAddress } from '@/lib/utils';
-import { ArrowUpRightIcon, ArrowDownLeftIcon, ArrowSquareOutIcon } from '@phosphor-icons/react/ssr';
+import { formatUsdc, shortenAddress } from "@/lib/utils";
+import { ArrowDownLeft, ArrowUpRight, ExternalLink, History } from "lucide-react";
 
-const ARC_EXPLORER = 'https://testnet.arcscan.app/tx';
+const ARC_EXPLORER = "https://testnet.arcscan.app/tx";
 
 type Transfer = {
   id: string;
@@ -10,74 +10,88 @@ type Transfer = {
   note: string | null;
   toAddress: string | null;
   status: string;
-  direction: 'sent' | 'received';
+  direction: "sent" | "received";
   txHash?: string | null;
 };
 
-export function TransactionList({ transfers }: { transfers: Transfer[] }) {
-  if (transfers.length === 0) {
-    return (
-      <div className='hush-card p-10 text-center'>
-        <div className='w-10 h-10 rounded-2xl bg-white/[0.04] flex items-center justify-center mx-auto mb-3'>
-          <ArrowUpRightIcon size={18} className='text-white-4' />
-        </div>
-        <p className='text-sm font-medium text-white-3'>No activity yet</p>
-      </div>
-    );
-  }
+const statusStyles: Record<string, { label: string; color: string }> = {
+  COMPLETE: { label: "Completed", color: "bg-up/10 text-green-300" },
+  PENDING: { label: "Pending", color: "bg-warn/10 text-amber-300" },
+  FAILED: { label: "Failed", color: "bg-down/10 text-red-300" },
+};
+
+const dateFormat = new Intl.DateTimeFormat("en", { month: "short", day: "numeric", timeZone: "UTC" });
+
+const columns = "grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 sm:px-5";
+
+export function TransactionList({ transfers, compact = false }: { transfers: Transfer[]; compact?: boolean }) {
+  const rowClass = compact ? columns : `${columns} md:grid-cols-[minmax(0,1fr)_7rem_7rem_8rem]`;
 
   return (
-    <div>
-      <p className='text-[11px] text-white-4 font-medium tracking-wider uppercase mb-3 px-0.5'>
-        Recent activity
-      </p>
-      <div className='hush-card overflow-hidden'>
-      <div className='max-h-[480px] overflow-y-auto divide-y divide-white/[0.04]'>
-        {transfers.map((t) => (
-          <div key={t.id} className='relative flex items-center gap-3.5 px-4 py-3.5 hover:bg-white/[0.02] transition-colors'>
-            {t.txHash && (
-              <a href={`${ARC_EXPLORER}/${t.txHash}`} target='_blank' rel='noopener noreferrer'
-                className='absolute inset-0' aria-label='View on Arc explorer' />
-            )}
-            <div
-              className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                t.direction === 'sent'
-                  ? 'bg-down/10 text-down'
-                  : 'bg-up/10 text-up'
-              }`}
-            >
-              {t.direction === 'sent' ? (
-                <ArrowUpRightIcon size={15} weight='bold' />
-              ) : (
-                <ArrowDownLeftIcon size={15} weight='bold' />
-              )}
-            </div>
-            <div className='flex-1 min-w-0'>
-              <p className='text-[13px] text-white-2 font-medium'>
-                {t.direction === 'sent' ? 'Sent' : 'Received'}
-              </p>
-              <p className='text-[11px] text-white-4 font-mono truncate mt-0.5'>
-                {t.toAddress ? shortenAddress(t.toAddress) : (t.note ?? '—')}
-              </p>
-            </div>
-            <div className='text-right flex-shrink-0'>
-              <p
-                className={`text-[13px] font-semibold ${t.direction === 'sent' ? 'text-down' : 'text-up'}`}
-              >
-                {t.direction === 'sent' ? '−' : '+'}
-                {formatUsdc(t.amountUsdc)}
-              </p>
-              <div className='flex items-center justify-end gap-1 mt-0.5'>
-                <p className='text-[11px] text-white-4'>
-                  {new Date(t.createdAt).toLocaleDateString('en', { month: 'short', day: 'numeric' })}
-                </p>
-                {t.txHash && <ArrowSquareOutIcon size={10} className='text-white-4' />}
-              </div>
-            </div>
-          </div>
-        ))}
+    <section className="hush-card" aria-label="Recent activity">
+      <div className="flex items-center gap-2.5 px-4 py-4 sm:px-5">
+        <History size={17} className="text-blue-300" />
+        <h2 className="text-base font-semibold text-white">Recent activity</h2>
       </div>
-      </div>
-    </div>
+      {transfers.length === 0 ? (
+        <div className="border-t border-line px-4 py-10 text-center">
+          <span className="mx-auto mb-3 grid size-11 place-items-center rounded-lg bg-blue-400/10 text-blue-300">
+            <History size={20} />
+          </span>
+          <p className="font-medium text-white-2">No activity yet</p>
+          <p className="mt-1 text-sm text-white-3">Your USDC transfers will appear here.</p>
+        </div>
+      ) : (
+        <>
+          {!compact && <div className={`${rowClass} hidden border-y border-line bg-bg/30 py-2.5 text-xs font-medium text-white-3 md:grid`} aria-hidden="true">
+            <span>Transfer</span><span>Status</span><span>Date</span><span className="text-right">Amount</span>
+          </div>}
+          <ul className="max-h-[480px] divide-y divide-line overflow-y-auto">
+            {transfers.map((transfer) => {
+              const sent = transfer.direction === "sent";
+              const Icon = sent ? ArrowUpRight : ArrowDownLeft;
+              const status = statusStyles[transfer.status] ?? { label: transfer.status, color: "bg-white/5 text-white-3" };
+              const date = new Date(transfer.createdAt);
+              const amount = `${sent ? "−" : "+"}${formatUsdc(transfer.amountUsdc)}`;
+              return (
+                <li key={`${transfer.direction}-${transfer.id}`} className={`${rowClass} py-3 hover:bg-white/[0.025]`}>
+                  <div className="flex min-w-0 items-center gap-3">
+                    <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-blue-400/10 text-blue-300">
+                      <Icon size={17} />
+                    </span>
+                    <div className="min-w-0">
+                      <p className="font-medium text-white-2">{sent ? "Sent" : "Received"}</p>
+                      <p className="truncate text-xs text-white-3">
+                        {transfer.toAddress ? shortenAddress(transfer.toAddress) : transfer.note ?? "USDC"}
+                      </p>
+                      <div className={compact ? "mt-1" : "mt-1 md:hidden"}>
+                        <span className={`badge ${status.color}`}>{status.label}</span>
+                      </div>
+                    </div>
+                  </div>
+                  {!compact && <div className="hidden md:block">
+                    <span className={`badge ${status.color}`}>{status.label}</span>
+                  </div>}
+                  {!compact && <time className="hidden text-xs text-white-3 md:block" dateTime={date.toISOString()}>
+                    {dateFormat.format(date)}
+                  </time>}
+                  <div className={`text-right font-semibold tabular-nums ${sent ? "text-white-2" : "text-green-300"}`}>
+                    {transfer.txHash ? (
+                      <a href={`${ARC_EXPLORER}/${transfer.txHash}`} target="_blank" rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 hover:underline" aria-label={`View ${amount} transfer on Arc explorer`}>
+                        {amount}<ExternalLink size={12} className="text-white-3" />
+                      </a>
+                    ) : amount}
+                    <time className={`block text-xs font-normal text-white-3 ${compact ? "" : "md:hidden"}`} dateTime={date.toISOString()}>
+                      {dateFormat.format(date)}
+                    </time>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </>
+      )}
+    </section>
   );
 }

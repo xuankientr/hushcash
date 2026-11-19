@@ -1,87 +1,64 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { ArrowDownLeft, ArrowUpRight, Link2, ReceiptText } from "lucide-react";
 import { BalanceCard } from "./BalanceCard";
 import { TransactionList } from "./TransactionList";
 import { SendModal } from "./SendModal";
 import { RequestModal } from "./RequestModal";
 
-type Transfer = {
-  id: string; createdAt: Date; amountUsdc: string;
-  note: string | null; toAddress: string | null;
-  status: string; direction: "sent" | "received";
-};
-
 type Modal = null | "send" | "request";
 
+const actionClass = "flex min-h-16 items-center gap-2 rounded-lg border border-line px-2.5 sm:gap-3 sm:px-3 py-2 text-left font-medium text-white transition-colors hover:border-blue-400/40 hover:bg-blue-400/10";
+const iconClass = "shrink-0 rounded-md bg-blue-400/10 p-2 text-blue-300";
+
 export function DashboardClient({
-  walletId,
   transfers,
 }: {
-  walletId?: string | null;
-  transfers: Transfer[];
+  transfers: React.ComponentProps<typeof TransactionList>["transfers"];
 }) {
   const [modal, setModal] = useState<Modal>(null);
-  const router = useRouter();
 
   return (
-    <>
-      <div className="max-w-sm mx-auto px-5 pt-12 space-y-8">
-        {/* Header */}
-        <div className="flex flex-col items-center text-center gap-3">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="HushCash" width={36} height={36} className="rounded-xl" />
-          <div>
-            <h1 className="text-2xl font-bold text-white leading-tight">
-              Send. Request. Claim.
-            </h1>
-            <p className="text-white-4 text-base mt-0.5">Privately.</p>
+    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-8 sm:py-10">
+      <header className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">Wallet overview</h1>
+          <p className="mt-1 text-white-3">Manage your USDC payments on Arc.</p>
+        </div>
+        <span className="inline-flex items-center gap-2 rounded-full border border-blue-400/20 bg-blue-400/10 px-3 py-1.5 text-xs font-medium text-blue-200">
+          <span className="size-1.5 rounded-full bg-blue-300" /> Arc testnet
+        </span>
+      </header>
+
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
+        <BalanceCard />
+        <section className="hush-card p-4 sm:p-5" aria-labelledby="payment-actions">
+          <h2 id="payment-actions" className="mb-4 text-base font-semibold text-white">Payments</h2>
+          <div className="grid grid-cols-2 gap-2.5">
+            <button type="button" onClick={() => setModal("send")} className={`${actionClass} border-blue-400/40 bg-blue-400/10`}>
+              <ArrowUpRight size={34} className={iconClass} /> Send
+            </button>
+            <button type="button" onClick={() => setModal("request")} className={actionClass}>
+              <ArrowDownLeft size={34} className={iconClass} /> Request
+            </button>
+            <Link href="/invoice/new" className={actionClass}>
+              <ReceiptText size={34} className={iconClass} /> Invoice
+            </Link>
+            <Link href="/plug" className={actionClass}>
+              <Link2 size={34} className={iconClass} /> The Plug
+            </Link>
           </div>
-        </div>
+        </section>
+      </div>
 
-        {/* Balance */}
-        <BalanceCard walletId={walletId} />
-
-        {/* Actions */}
-        <div className="flex gap-3">
-          <button
-            onClick={() => setModal("send")}
-            className="flex-1 h-12 rounded-2xl bg-white text-black text-sm font-semibold hover:bg-white/90 transition-all active:scale-[0.97]"
-          >
-            Send
-          </button>
-          <button
-            onClick={() => setModal("request")}
-            className="flex-1 h-12 rounded-2xl border border-white/[0.12] text-white text-sm font-semibold hover:bg-white/[0.05] transition-all active:scale-[0.97]"
-          >
-            Request
-          </button>
-          <button
-            onClick={() => router.push("/invoice/new")}
-            className="flex-1 h-12 rounded-2xl border border-white/[0.12] text-white text-sm font-semibold hover:bg-white/[0.05] transition-all active:scale-[0.97]"
-          >
-            Invoice
-          </button>
-        </div>
-
-        {/* Plug banner */}
-        <a
-          href="/plug"
-          className="flex items-center gap-2.5 px-4 py-2.5 rounded-2xl border border-up/20 bg-up/[0.06] hover:bg-up/[0.10] transition-colors group"
-        >
-          <span className="w-1.5 h-1.5 rounded-full bg-up flex-shrink-0" />
-          <span className="text-[13px] font-semibold text-up">The Plug</span>
-          <span className="text-[13px] text-up/60 flex-1">Embed private payments</span>
-          <span className="text-up/50 group-hover:text-up/80 transition-colors text-sm">→</span>
-        </a>
-
-        {/* Activity */}
+      <div className="mt-6">
         <TransactionList transfers={transfers} />
       </div>
 
       {modal === "send" && <SendModal onClose={() => setModal(null)} />}
       {modal === "request" && <RequestModal onClose={() => setModal(null)} />}
-    </>
+    </div>
   );
 }

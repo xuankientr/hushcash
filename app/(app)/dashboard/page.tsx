@@ -22,5 +22,5 @@ export default async function DashboardPage() {
     .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
     .slice(0, 10);
 
-  return <DashboardClient walletId={dbUser?.walletId} transfers={transfers} />;
+  return <DashboardClient transfers={transfers} />;
 }

@@ -497,7 +497,7 @@ export function SettingsClient({ walletAddress, displayName, totalSent, totalRec
         )}
 
         {tab === "activity" && (
-          <TransactionList transfers={transfers} />
+          <TransactionList transfers={transfers} compact />
         )}
       </div>
 

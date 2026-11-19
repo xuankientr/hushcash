@@ -1,58 +1,57 @@
-'use client';
+"use client";
 
-import { useQuery } from '@tanstack/react-query';
-import { formatUsdc } from '@/lib/utils';
-import {
-  EyeIcon,
-  EyeSlashIcon,
-  ArrowsClockwiseIcon,
-} from '@phosphor-icons/react';
-import { useState } from 'react';
+import { useQuery } from "@tanstack/react-query";
+import { formatUsdc } from "@/lib/utils";
+import { Eye, EyeOff, RefreshCw } from "lucide-react";
+import { useState } from "react";
 
-export function BalanceCard({ walletId }: { walletId?: string | null }) {
+const controlClass = "grid size-10 place-items-center rounded-lg border border-white/10 bg-bg/40 text-white-2 hover:bg-blue-400/20 disabled:opacity-60";
+
+export function BalanceCard() {
   const [hidden, setHidden] = useState(false);
   const { data, isLoading, refetch, isFetching } = useQuery({
-    queryKey: ['balance'],
-    queryFn: () => fetch('/api/wallet/balance').then((r) => r.json()),
+    queryKey: ["balance"],
+    queryFn: async () => {
+      const response = await fetch("/api/wallet/balance");
+      if (!response.ok) throw new Error("Balance unavailable");
+      return (await response.json()) as { balance: string };
+    },
     staleTime: 30_000,
     refetchInterval: 30_000,
     refetchOnWindowFocus: false,
   });
-  const balance = data?.balance ?? '0';
 
   return (
-    <div className='text-center py-2'>
-      {isLoading ? (
-        <div className='h-14 w-44 bg-white/[0.05] rounded-2xl animate-pulse mx-auto' />
-      ) : (
-        <span className='font-bold text-white tracking-tight leading-none' style={{ fontSize: 'clamp(2rem, 12vw, 3.5rem)' }}>
-          {hidden ? '$ ••••••' : formatUsdc(balance)}
-        </span>
-      )}
-
-      <div className='flex items-center justify-center gap-2 mt-3'>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/USDC_Logo.png" alt="USDC" width={15} height={15} className="rounded-full opacity-70" />
-        <span className="text-xs text-white-4">USDC</span>
-        <div className='flex items-center gap-1'>
-          <button
-            onClick={() => refetch()}
-            className='w-10 h-10 flex items-center justify-center text-white-4 hover:text-white-3 transition-colors'
-          >
-            <ArrowsClockwiseIcon
-              size={13}
-              className={isFetching ? 'animate-spin' : ''}
-            />
+    <section className="hush-card wallet-grid flex min-h-56 flex-col justify-between gap-5 border-blue-400/20 p-5 sm:p-6" aria-labelledby="wallet-balance">
+      <div className="flex items-center justify-between gap-2">
+        <h2 id="wallet-balance" className="text-sm font-medium text-blue-100">Wallet balance</h2>
+        <div className="flex gap-2">
+          <button type="button" onClick={() => refetch()} disabled={isFetching} aria-label="Refresh balance" className={controlClass}>
+            <span className={isFetching ? "motion-safe:animate-spin" : undefined}><RefreshCw size={15} /></span>
           </button>
-          <button
-            onClick={() => setHidden((h) => !h)}
-            className='w-10 h-10 flex items-center justify-center text-white-4 hover:text-white-3 transition-colors'
-          >
-            {hidden ? <EyeSlashIcon size={13} /> : <EyeIcon size={13} />}
+          <button type="button" onClick={() => setHidden((value) => !value)} aria-label={hidden ? "Show balance" : "Hide balance"} className={controlClass}>
+            {hidden ? <EyeOff size={16} /> : <Eye size={16} />}
           </button>
         </div>
       </div>
-    </div>
+      <div aria-live="polite">
+        {isLoading ? (
+          <>
+            <span className="sr-only">Loading balance</span>
+            <div className="h-12 w-40 rounded-lg bg-white/10 motion-safe:animate-pulse" />
+          </>
+        ) : typeof data?.balance === "string" ? (
+          <p className="break-words text-4xl font-semibold leading-none tracking-tight text-white tabular-nums sm:text-5xl">
+            {hidden ? <span aria-label="Balance hidden">••••••</span> : formatUsdc(data.balance)}
+          </p>
+        ) : (
+          <p className="text-lg font-medium text-white-2">Balance unavailable</p>
+        )}
+      </div>
+      <div className="flex items-center gap-2 text-sm font-medium text-white-2">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/USDC_Logo.png" alt="" width={21} height={21} className="rounded-full" /> USDC
+      </div>
+    </section>
   );
 }
-
