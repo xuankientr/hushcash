@@ -1,15 +1,18 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { usePrivy } from '@privy-io/react-auth';
 import { isValidUsername, generateUsername } from '@/lib/utils';
 
 export default function OnboardingPage() {
-  const { ready, authenticated } = usePrivy();
+  const { ready, authenticated, getAccessToken } = usePrivy();
   const router = useRouter();
   const [username, setUsername] = useState('');
-  const [status, setStatus] = useState<'idle' | 'checking' | 'available' | 'taken' | 'invalid'>('idle');
+  const [availability, setAvailability] = useState<{ username: string; status: 'available' | 'taken' | 'unavailable' }>();
+  const [error, setError] = useState('');
+  const valid = isValidUsername(username);
+  const status = !username ? 'idle' : !valid ? 'invalid' : availability?.username === username ? availability.status : 'checking';
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -20,41 +23,57 @@ export default function OnboardingPage() {
     setUsername(generateUsername());
   }, []);
 
-  const checkAvailability = useCallback(async (value: string) => {
-    if (!isValidUsername(value)) { setStatus('invalid'); return; }
-    setStatus('checking');
-    try {
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 5000);
-      const res = await fetch(`/api/user/username?check=${encodeURIComponent(value)}`, { signal: controller.signal });
-      clearTimeout(timer);
-      if (!res.ok) { setStatus('idle'); return; }
-      const data = await res.json();
-      setStatus(data.available ? 'available' : 'taken');
-    } catch {
-      setStatus('idle');
-    }
-  }, []);
-
   useEffect(() => {
-    if (!username) return;
-    const t = setTimeout(() => checkAvailability(username), 400);
-    return () => clearTimeout(t);
-  }, [username, checkAvailability]);
+    if (!isValidUsername(username)) return;
+    const controller = new AbortController();
+    const debounce = setTimeout(async () => {
+      const timeout = setTimeout(() => controller.abort(), 5000);
+      try {
+        const res = await fetch(`/api/user/username?check=${encodeURIComponent(username)}`, { signal: controller.signal });
+        if (!res.ok) throw new Error('Availability check failed');
+        const { available } = await res.json();
+        if (!controller.signal.aborted) setAvailability({ username, status: available ? 'available' : 'taken' });
+      } catch {
+        if (!cancelled) setAvailability({ username, status: 'unavailable' });
+      } finally {
+        clearTimeout(timeout);
+      }
+    }, 400);
+    let cancelled = false;
+    return () => {
+      cancelled = true;
+      clearTimeout(debounce);
+      controller.abort();
+    };
+  }, [username]);
 
   const handleSave = async () => {
-    if (status !== 'available') return;
+    if (!valid || status === 'taken' || saving || !authenticated) return;
     setSaving(true);
-    const res = await fetch('/api/user/username', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username }),
-    });
-    if (res.ok) {
-      router.push('/dashboard');
-    } else {
+    setError('');
+    try {
+      const token = await getAccessToken();
+      const res = await fetch('/api/user/username', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ username }),
+      });
+      if (res.ok) {
+        router.replace('/dashboard');
+        return;
+      }
+      if (res.status === 409) {
+        setAvailability({ username, status: 'taken' });
+      } else {
+        setError(res.status === 401 ? 'Your session has expired. Sign in again.' : 'Could not save your username. Please try again.');
+      }
+    } catch {
+      setError('Could not save your username. Please try again.');
+    } finally {
       setSaving(false);
-      setStatus('taken');
     }
   };
 
@@ -62,6 +81,7 @@ export default function OnboardingPage() {
     idle: 'text-white-4',
     checking: 'text-white-4',
     available: 'text-green-400',
+    unavailable: 'text-white-3',
     taken: 'text-red-400',
     invalid: 'text-yellow-400',
   }[status];
@@ -70,6 +90,7 @@ export default function OnboardingPage() {
     idle: '',
     checking: 'Checking...',
     available: '✓ Available',
+    unavailable: 'Availability will be checked when you confirm.',
     taken: '✗ Already taken',
     invalid: 'Username must be 3–20 chars, letters/numbers/underscores only',
   }[status];
@@ -94,27 +115,31 @@ export default function OnboardingPage() {
             <input
               type='text'
               value={username}
-              onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
+              onChange={(e) => { setError(''); setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '')); }}
+              aria-label='Username'
+              disabled={saving}
               placeholder='your_username'
               maxLength={20}
-              className='flex-1 bg-transparent text-white text-sm outline-none placeholder:text-white-4'
+              className='min-w-0 flex-1 border-0 bg-transparent text-white text-sm outline-none placeholder:text-white-4'
             />
           </div>
           {statusText && (
-            <p className={`text-[12px] px-1 ${statusColor}`}>{statusText}</p>
+            <p role='status' className={`text-[12px] px-1 ${statusColor}`}>{statusText}</p>
           )}
         </div>
 
         <div className='space-y-2'>
+          {error && <p role='alert' className='text-sm text-red-300'>{error}</p>}
           <button
             onClick={handleSave}
-            disabled={status !== 'available' || saving}
+            disabled={!valid || status === 'taken' || saving || !ready || !authenticated}
             className='w-full h-12 rounded-2xl bg-primary hover:bg-primary-h text-white text-sm font-semibold transition-all disabled:opacity-40 shadow-lg shadow-primary/20 active:scale-[0.98]'
           >
             {saving ? 'Saving...' : 'Confirm username'}
           </button>
           <button
-            onClick={() => { setUsername(generateUsername()); setStatus('idle'); }}
+            onClick={() => { setError(''); setUsername(generateUsername()); }}
+            disabled={saving}
             className='w-full h-10 rounded-2xl text-white-4 hover:text-white-3 text-sm transition-colors'
           >
             Generate another

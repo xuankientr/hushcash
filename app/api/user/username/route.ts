@@ -27,7 +27,7 @@ const schema = z.object({
 
 // PATCH /api/user/username — set or update username
 export async function PATCH(req: NextRequest) {
-  const user = await getAuthUser();
+  const user = await getAuthUser(req);
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
