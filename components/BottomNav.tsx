@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { HouseIcon, GearIcon, ReceiptIcon } from "@phosphor-icons/react";
+import { HouseIcon, GearIcon, GiftIcon, ReceiptIcon } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 
 export function BottomNav({ unread }: { unread: number }) {
@@ -10,7 +10,8 @@ export function BottomNav({ unread }: { unread: number }) {
 
   const items = [
     { href: "/dashboard", Icon: HouseIcon, label: "Overview", badge: 0 },
-    { href: "/invoice/new", Icon: ReceiptIcon, label: "Invoice", badge: 0 },
+    { href: "/payments", Icon: ReceiptIcon, label: "Payments", badge: 0 },
+    { href: "/drop", Icon: GiftIcon, label: "Drop Cash", badge: 0 },
     { href: "/settings", Icon: GearIcon, label: "Settings", badge: unread },
   ];
 

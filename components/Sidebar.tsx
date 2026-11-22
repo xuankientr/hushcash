@@ -2,14 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, CircleDollarSign, LayoutGrid, ReceiptText, Settings } from "lucide-react";
+import { BookOpen, CircleDollarSign, Gift, LayoutGrid, ReceiptText, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUnreadCount } from "@/hooks/useUnreadCount";
 import { BottomNav } from "./BottomNav";
 
 const navigation = [
   { href: "/dashboard", label: "Overview", icon: LayoutGrid },
-  { href: "/invoice/new", label: "Invoice", icon: ReceiptText },
+  { href: "/payments", label: "Payments", icon: ReceiptText },
+  { href: "/drop", label: "Drop Cash", icon: Gift },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 

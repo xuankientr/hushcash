@@ -14,8 +14,9 @@ HushCash is a non-custodial payments app built natively on Arc. Users sign in wi
 
 - **Send** — Pay anyone by @username or wallet address; scan a QR code to fill the recipient instantly; tap a saved contact for one-tap sending
 - **Request** — Generate a shareable payment link; optional split mode divides a total between people with custom % or fixed USDC amounts per person
-- **Invoice** — Create an invoice with title, amount, and proof of work (note, photo, or URL); share a link or QR code; client pays in one tap
-- **Drop Cash** — Pre-load a claimable link backed by on-chain escrow; whoever has the link can claim the funds — no account required
+- **Invoice** — Create and share an invoice with a title, amount, and optional proof of work. View or share the payment receipt after Circle confirms the transfer on Arc.
+- **Payments** — Track your invoices and requests, see which participants paid their split shares, and copy links or confirmed receipts.
+- **Drop Cash** — Fund an expiring claim link through a Circle-managed escrow wallet. The holder can claim to an Arc wallet without an account. The sender can refund unclaimed funds after expiry.
 - **Contacts** — Save frequent recipients as named contacts; appears as quick-fill chips in the Send flow; stored per account
 - **Notifications** — Badge on the Settings icon when new funds arrive; clears when the Activity tab is opened
 - **Wallet** — Deposit, withdraw, and track balance; Activity tab auto-syncs pending transactions with the network on open
@@ -31,9 +32,9 @@ Both contracts are deployed on Arc Testnet.
 | InvoiceRegistry | [`0x87090C9d427e71c8E2661D483a11A8DeE3a9Bd88`](https://testnet.arcscan.app/address/0x87090C9d427e71c8E2661D483a11A8DeE3a9Bd88) |
 | PrivacyRouter *(coming soon)* | Pending Arc Privacy availability on testnet |
 
-**DropCashEscrow** — trustless escrow for drop links. Creator deposits USDC locked to a `keccak256(code)` hash; claimant proves knowledge of the code to withdraw.
+**DropCashEscrow** — standalone escrow contract source. The current web app funds and pays out drops through Circle Developer Controlled Wallets.
 
-**InvoiceRegistry** — on-chain invoice lifecycle. Service provider registers an invoice by code + amount; client pays with exact native USDC; funds transfer directly to the creator.
+**InvoiceRegistry** — standalone invoice contract source. The current web app records invoices in PostgreSQL and settles them using confirmed Circle transfers.
 
 **PrivacyRouter** *(coming soon)* — once Arc Privacy is live on Arc Testnet, HushCash will deploy a confidential payment router that routes transfers through Arc's confidential smart contract engine, making transaction data cryptographically private at the protocol level.
 
@@ -93,6 +94,27 @@ npx prisma db push
 # Run dev server
 npm run dev
 ```
+
+### Updating an existing database
+
+For a database already on the schema from before Payments and Drop Cash, apply
+`prisma/payments-and-drops.sql` once through the Supabase SQL editor or Prisma
+against the direct database connection:
+
+```bash
+npx prisma db execute --file prisma/payments-and-drops.sql --url "$DIRECT_URL"
+```
+
+Old paid links retain their historical status. Receipt links require a verified
+Circle transaction recorded by the new flow. Old requests without group data
+appear as individual links.
+
+New drops use Circle Smart Contract Accounts on Arc Testnet. Configure and
+verify a Circle Gas Station policy that sponsors escrow payouts, then set
+`DROP_GAS_SPONSORSHIP_ENABLED=true` in the deployment environment. Existing EOA
+escrow wallets may need native USDC for gas. New drops can be tested end to end
+by funding a drop, claiming to another wallet, and separately refunding an
+expired drop.
 
 ## Deploying Contracts
 

@@ -1,8 +1,9 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { usePrivy } from "@privy-io/react-auth";
-import { PaperPlaneTiltIcon, CheckCircleIcon } from "@phosphor-icons/react";
+import { PaperPlaneTiltIcon } from "@phosphor-icons/react";
 import { formatUsdc } from "@/lib/utils";
 
 interface PayWidgetProps {
@@ -20,18 +21,9 @@ export function PayWidget({ request }: PayWidgetProps) {
   const { ready, authenticated, login, getAccessToken } = usePrivy();
   const [amount, setAmount] = useState(request.amountUsdc ?? "");
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const router = useRouter();
   const [error, setError] = useState("");
 
-  if (success) {
-    return (
-      <div className="hush-card p-10 text-center">
-        <CheckCircleIcon size={40} weight="duotone" className="text-up mx-auto mb-3" />
-        <h2 className="text-lg font-bold text-white mb-1">Payment sent!</h2>
-        <p className="text-sm text-white-3">Your USDC is on its way</p>
-      </div>
-    );
-  }
 
   return (
     <div className="hush-card p-5 space-y-4">
@@ -66,29 +58,34 @@ export function PayWidget({ request }: PayWidgetProps) {
       ) : (
         <form onSubmit={async (e) => {
           e.preventDefault(); setError(""); setLoading(true);
-          const token = await getAccessToken();
-          const res = await fetch("/api/transfer", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              ...(token ? { Authorization: `Bearer ${token}` } : {}),
-            },
-            body: JSON.stringify({
-              to: request.user.walletAddress ?? "",
-              amountUsdc: amount,
-              requestCode: request.code,
-            }),
-          });
-          const data = await res.json();
-          setLoading(false);
-          if (!res.ok) { setError(data.error ?? "Payment failed"); return; }
-          setSuccess(true);
+          try {
+            const token = await getAccessToken();
+            const res = await fetch("/api/transfer", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+              },
+              body: JSON.stringify({
+                to: request.user.walletAddress ?? "",
+                amountUsdc: amount,
+                requestCode: request.code,
+              }),
+            });
+            const data = await res.json();
+            if (!res.ok) { setError(data.error ?? "Payment failed"); return; }
+            router.refresh();
+          } catch {
+            setError("Could not verify submission. Try again.");
+          } finally {
+            setLoading(false);
+          }
         }} className="space-y-3">
           <div>
             <label className="text-xs text-white-4 mb-1.5 block">Amount</label>
             <div className="relative">
               <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)}
-                placeholder="0.00" min="0.01" step="0.01" readOnly={!!request.amountUsdc}
+                placeholder="0.00" min="0.000001" step="0.000001" readOnly={!!request.amountUsdc}
                 className={inp + " pr-16"} required />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-white-4 font-semibold">USDC</span>
             </div>

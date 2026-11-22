@@ -1,5 +1,7 @@
 import { initiateDeveloperControlledWalletsClient } from "@circle-fin/developer-controlled-wallets";
 
+const arcUsdcTokenId = "15dc2b5d-0994-58b0-bf8c-3a0501148ee8";
+
 let circleClient: ReturnType<typeof initiateDeveloperControlledWalletsClient> | null = null;
 
 function getCircleClient() {
@@ -36,11 +38,13 @@ export async function transferUsdc(params: {
   sourceWalletId: string;
   destinationAddress: string;
   amountUsdc: string;
+  idempotencyKey?: string;
 }) {
   const client = getCircleClient();
   const response = await client.createTransaction({
+    idempotencyKey: params.idempotencyKey,
     walletId: params.sourceWalletId,
-    tokenId: "15dc2b5d-0994-58b0-bf8c-3a0501148ee8", // native USDC on Arc Testnet
+    tokenId: arcUsdcTokenId,
     destinationAddress: params.destinationAddress,
     amount: [params.amountUsdc],
     fee: { type: "level", config: { feeLevel: "MEDIUM" } },
@@ -52,7 +56,15 @@ export async function getTransactionDetails(circleTransferId: string) {
   const client = getCircleClient();
   const response = await client.getTransaction({ id: circleTransferId });
   const tx = response.data?.transaction;
-  return { txHash: tx?.txHash ?? null, state: tx?.state ?? null };
+  return {
+    txHash: tx?.txHash ?? null,
+    state: tx?.state ?? null,
+    confirmedAt: tx?.firstConfirmDate ?? tx?.updateDate ?? null,
+    amount: tx?.amounts?.length === 1 ? tx.amounts[0] : null,
+    destination: tx?.destinationAddress ?? null,
+    walletId: tx?.walletId ?? null,
+    arcUsdc: tx?.blockchain === "ARC-TESTNET" && tx.tokenId === arcUsdcTokenId,
+  };
 }
 
 export async function exportWalletKey(walletId: string) {
@@ -61,12 +73,14 @@ export async function exportWalletKey(walletId: string) {
   return response.data?.wallet;
 }
 
-export async function createEscrowWallet(linkId: string) {
+export async function createEscrowWallet(linkId: string, idempotencyKey?: string) {
   const client = getCircleClient();
   const response = await client.createWallets({
     blockchains: ["ARC-TESTNET"],
     count: 1,
     walletSetId: process.env.CIRCLE_WALLET_SET_ID!,
+    idempotencyKey,
+    accountType: "SCA",
     metadata: [{ name: `escrow-${linkId}`, refId: linkId }],
   });
   return response.data?.wallets?.[0];

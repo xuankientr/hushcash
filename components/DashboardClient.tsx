@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowDownLeft, ArrowUpRight, Link2, ReceiptText } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, Gift, ReceiptText } from "lucide-react";
 import { BalanceCard } from "./BalanceCard";
 import { TransactionList } from "./TransactionList";
 import { SendModal } from "./SendModal";
@@ -46,10 +46,11 @@ export function DashboardClient({
             <Link href="/invoice/new" className={actionClass}>
               <ReceiptText size={34} className={iconClass} /> Invoice
             </Link>
-            <Link href="/plug" className={actionClass}>
-              <Link2 size={34} className={iconClass} /> The Plug
+            <Link href="/drop" className={actionClass}>
+              <Gift size={34} className={iconClass} /> Drop Cash
             </Link>
           </div>
+          <Link href="/plug" className="mt-3 inline-block text-xs text-blue-200 hover:underline">Embed payments with The Plug</Link>
         </section>
       </div>
 

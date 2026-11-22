@@ -15,12 +15,12 @@ export default function DropPage() {
         <h2 className="text-base font-semibold text-white">How it works</h2>
         <ol className="space-y-2">
           {[
-            'Tap Drop on the dashboard.',
-            'Enter an amount to lock into the link.',
+            'Open Drop Cash on the dashboard.',
+            'Enter the amount and choose how long the link is valid.',
             'Add an optional note.',
-            'HushCash creates an escrow wallet and locks the funds.',
-            'Share the link — hushcash.xyz/claim/...',
-            'The first person to open it can claim the funds to any wallet address.',
+            'HushCash creates a Circle-controlled escrow wallet and submits the funding transfer.',
+            'Wait for funding to confirm, then copy and share the link.',
+            'The link holder can claim to an Arc Testnet wallet before the deadline.',
           ].map((s, i) => (
             <li key={i} className="flex gap-2.5 text-sm text-white-3">
               <span className="text-white-4 flex-shrink-0">{i + 1}.</span> {s}
@@ -33,9 +33,9 @@ export default function DropPage() {
         <h2 className="text-base font-semibold text-white">Use cases</h2>
         <ul className="space-y-1.5">
           {[
-            'Send money to someone who doesn\'t have a crypto wallet yet.',
+            'Send USDC to someone without a HushCash account.',
             'Split costs — drop a link in a group chat.',
-            'Anonymous gifting.',
+            'Share a gift link with its intended recipient.',
           ].map((item) => (
             <li key={item} className="flex gap-2.5 text-sm text-white-3">
               <span className="text-white-4 flex-shrink-0">—</span> {item}
@@ -45,9 +45,9 @@ export default function DropPage() {
       </div>
 
       <div className="p-4 rounded-2xl border border-white/[0.07] bg-white/[0.02]">
-        <p className="text-[12px] font-semibold text-white-2 mb-1">One claim per link</p>
+        <p className="text-[12px] font-semibold text-white-2 mb-1">Claims and refunds</p>
         <p className="text-[12px] text-white-4 leading-relaxed">
-          Each Drop Cash link can only be claimed once. After claiming, the link is marked complete and the funds are released to the claimer&apos;s address.
+          Each drop can be claimed once. If the deadline passes before someone claims it, open Drop Cash and choose Return funds to my wallet. The page shows when Circle confirms the claim or refund. HushCash uses Circle escrow wallets for funding and payouts.
         </p>
       </div>
 

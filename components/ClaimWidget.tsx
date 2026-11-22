@@ -1,7 +1,8 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { GiftIcon, CheckCircleIcon } from "@phosphor-icons/react";
+import { GiftIcon } from "@phosphor-icons/react";
 import { formatUsdc } from "@/lib/utils";
 
 interface ClaimWidgetProps {
@@ -10,28 +11,23 @@ interface ClaimWidgetProps {
 
 const inp = "w-full bg-bg border border-line-2 rounded-lg px-3 py-2.5 text-white-2 text-sm placeholder:text-white-4 font-mono focus:border-primary transition-colors outline-none";
 
-export function ClaimWidget({ link }: ClaimWidgetProps) {
+export function ClaimWidget({ link, canRetry }: ClaimWidgetProps & { canRetry: boolean }) {
+  const router = useRouter();
   const [address, setAddress] = useState("");
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
 
-  if (link.status !== "UNCLAIMED") {
-    return (
-      <div className="hush-card p-8 text-center">
-        <p className="text-sm text-white-3">This link has already been {link.status.toLowerCase()}</p>
-      </div>
-    );
-  }
-
-  if (success) {
-    return (
-      <div className="hush-card p-10 text-center">
-        <CheckCircleIcon size={40} weight="duotone" className="text-up mx-auto mb-3" />
-        <h2 className="text-lg font-bold text-white mb-1">Claimed!</h2>
-        <p className="text-sm text-white-3">{formatUsdc(link.amountUsdc)} sent to your wallet</p>
-      </div>
-    );
+  if (link.status !== "UNCLAIMED" && !canRetry) {
+    const labels: Record<string, string> = {
+      FUNDING: "Waiting for escrow funding to confirm.",
+      FUNDING_FAILED: "Escrow funding failed.",
+      CLAIMING: "Your claim is awaiting network confirmation.",
+      CLAIMED: "This drop has been claimed.",
+      EXPIRED: "The deadline to claim this drop has passed.",
+      REFUNDING: "Refund awaiting network confirmation.",
+      REFUNDED: "The funds were returned to the sender.",
+    };
+    return <p className="hush-card p-6 text-center text-white-2" role="status">{labels[link.status] ?? "This drop is unavailable."}</p>;
   }
 
   return (
@@ -41,20 +37,25 @@ export function ClaimWidget({ link }: ClaimWidgetProps) {
           <GiftIcon size={28} weight="duotone" className="text-primary" />
         </div>
         <p className="text-3xl font-bold text-white">{formatUsdc(link.amountUsdc)}</p>
-        <p className="text-sm text-white-3 mt-1">USDC waiting for you</p>
+        <p className="text-sm text-white-3 mt-1">{canRetry ? "Retry using the original claim address" : "USDC waiting for you"}</p>
         {link.note && <p className="text-sm text-white-4 mt-2 italic">"{link.note}"</p>}
       </div>
 
       <form onSubmit={async (e) => {
         e.preventDefault(); setError(""); setLoading(true);
-        const res = await fetch("/api/claim", {
-          method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ code: link.code, toAddress: address }),
-        });
-        const data = await res.json();
-        setLoading(false);
-        if (!res.ok) { setError(data.error ?? "Failed to claim"); return; }
-        setSuccess(true);
+        try {
+          const res = await fetch("/api/claim", {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ code: link.code, toAddress: address.trim() }),
+          });
+          const data = await res.json();
+          if (!res.ok) setError(data.error ?? "Failed to claim");
+        } catch {
+          setError("Could not verify the claim. Retry using the same wallet address.");
+        } finally {
+          setLoading(false);
+          router.refresh();
+        }
       }} className="space-y-3">
         <div>
           <label className="text-xs text-white-4 mb-1.5 block">Your wallet address</label>

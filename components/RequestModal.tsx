@@ -32,6 +32,8 @@ export function RequestModal({ onClose }: { onClose: () => void }) {
   const [amount, setAmount] = useState("");
   const [note, setNote]     = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [names, setNames] = useState<string[]>(["", ""]);
 
   // Single-link result
   const [url, setUrl]       = useState("");
@@ -48,22 +50,25 @@ export function RequestModal({ onClose }: { onClose: () => void }) {
   // Auto-fill equal shares when total or number of people changes
   useEffect(() => {
     if (!split || !total) return;
-    const eq = fmt(total / people.length);
-    setPeople((prev) => prev.map(() => eq));
+    const cents = Math.round(total * 100);
+    setPeople((prev) => prev.map((_, i) => fmt((Math.floor(cents / prev.length) + Number(i < cents % prev.length)) / 100)));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [total, split]);
 
   const personAmounts = people.map((p) => parsePersonAmount(p, total));
   const splitTotal    = personAmounts.reduce((a, b) => a + b, 0);
-  const balanced      = total > 0 && Math.abs(splitTotal - total) < 0.005;
+  const balanced      = total > 0 && personAmounts.every((share) => share >= 0.01) &&
+    personAmounts.reduce((sum, share) => sum + Math.round(share * 100), 0) === Math.round(total * 100);
   const diff          = splitTotal - total;
 
   function addPerson() {
     setPeople((p) => [...p, total ? fmt(0) : ""]);
+    setNames((prev) => [...prev, ""]);
   }
   function removePerson(i: number) {
     if (people.length <= 2) return;
     setPeople((p) => p.filter((_, idx) => idx !== i));
+    setNames((prev) => prev.filter((_, idx) => idx !== i));
   }
   function updatePerson(i: number, val: string) {
     setPeople((p) => p.map((v, idx) => idx === i ? val : v));
@@ -72,13 +77,20 @@ export function RequestModal({ onClose }: { onClose: () => void }) {
   // ── single link ────────────────────────────────────────────────────────────
   async function handleCreate() {
     setLoading(true);
-    const res = await fetch("/api/request", {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ amountUsdc: amount || undefined, note: note || undefined }),
-    });
-    const data = await res.json();
-    setLoading(false);
-    if (res.ok) setUrl(data.url);
+    setError("");
+    try {
+      const res = await fetch("/api/request", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amountUsdc: amount || undefined, note: note || undefined }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Could not create request");
+      setUrl(data.url);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Could not create request");
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function handleCopy() {
@@ -90,18 +102,25 @@ export function RequestModal({ onClose }: { onClose: () => void }) {
   // ── split links ────────────────────────────────────────────────────────────
   async function handleSplit() {
     setLoading(true);
-    const results: SplitLink[] = [];
-    for (let i = 0; i < people.length; i++) {
-      const amt = fmt(personAmounts[i]);
+    setError("");
+    try {
       const res = await fetch("/api/request", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amountUsdc: amt, note: note || undefined }),
+        body: JSON.stringify({
+          note: note || undefined,
+          shares: personAmounts.map((value, index) => ({
+            amountUsdc: fmt(Math.round(value * 100) / 100), participant: names[index]?.trim() || `Person ${index + 1}`,
+          })),
+        }),
       });
-      const data = await res.json();
-      if (res.ok) results.push({ label: `Person ${i + 1}`, url: data.url, copied: false });
+      if (!res.ok) throw new Error("Could not create split links. Each share must be greater than zero.");
+      const data: { requests: { participant: string; url: string }[] } = await res.json();
+      setSplitLinks(data.requests.map(({ participant, url }) => ({ label: participant, url, copied: false })));
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Could not create split links");
+    } finally {
+      setLoading(false);
     }
-    setSplitLinks(results);
-    setLoading(false);
   }
 
   async function copySplitLink(i: number) {
@@ -111,7 +130,7 @@ export function RequestModal({ onClose }: { onClose: () => void }) {
   }
 
   async function copyAllLinks() {
-    const text = splitLinks.map((l, i) => `Person ${i + 1}: ${l.url}`).join("\n");
+    const text = splitLinks.map((l) => `${l.label}: ${l.url}`).join("\n");
     await navigator.clipboard.writeText(text);
     setCopiedAll(true);
     setTimeout(() => setCopiedAll(false), 2000);
@@ -119,7 +138,7 @@ export function RequestModal({ onClose }: { onClose: () => void }) {
 
   function reset() {
     setUrl(""); setSplitLinks([]); setAmount(""); setNote("");
-    setPeople(["", ""]); setSplit(false);
+    setPeople(["", ""]); setNames(["", ""]); setError(""); setSplit(false);
   }
 
   // ── result views ───────────────────────────────────────────────────────────
@@ -130,7 +149,8 @@ export function RequestModal({ onClose }: { onClose: () => void }) {
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
       <div
-        className="relative w-full max-w-sm bg-card rounded-t-3xl sm:rounded-3xl border border-white/[0.08]"
+        role="dialog" aria-modal="true" aria-label="Create payment request"
+        className="relative w-full max-w-sm max-h-[90dvh] overflow-y-auto bg-card rounded-t-3xl sm:rounded-3xl border border-white/[0.08]"
         style={{ boxShadow: "0 -8px 48px rgba(0,0,0,0.6)" }}
       >
         {/* Header */}
@@ -142,7 +162,7 @@ export function RequestModal({ onClose }: { onClose: () => void }) {
               <span className="text-[11px] font-normal text-white-4 ml-1">· Split</span>
             )}
           </div>
-          <button onClick={onClose}
+          <button type="button" aria-label="Close request" onClick={onClose}
             className="w-11 h-11 flex items-center justify-center rounded-full bg-white/[0.06] text-white-4 hover:text-white transition-colors">
             <XIcon size={14} weight="bold" />
           </button>
@@ -150,6 +170,7 @@ export function RequestModal({ onClose }: { onClose: () => void }) {
 
         <div className="px-5 space-y-3" style={{ paddingBottom: "max(1.25rem, env(safe-area-inset-bottom))" }}>
 
+          {error && <p role="alert" className="text-sm text-red-300">{error}</p>}
           {/* ── single result ── */}
           {showSingleResult && (
             <div className="space-y-3">
@@ -236,7 +257,7 @@ export function RequestModal({ onClose }: { onClose: () => void }) {
 
               {/* Split toggle */}
               <button
-                onClick={() => { setSplit((s) => !s); if (!split && total) setPeople([fmt(total / 2), fmt(total / 2)]); }}
+                onClick={() => { setSplit((s) => !s);  }}
                 className={`w-full flex items-center justify-between px-4 py-2.5 rounded-2xl border transition-all text-sm font-medium ${
                   split
                     ? "border-primary/40 bg-primary/10 text-primary"
@@ -256,10 +277,14 @@ export function RequestModal({ onClose }: { onClose: () => void }) {
                     const computed = parsePersonAmount(val, total);
                     const pct = total > 0 ? ((computed / total) * 100).toFixed(0) : "—";
                     return (
-                      <div key={i} className="flex items-center gap-2">
-                        <span className="text-[11px] text-white-4 w-14 flex-shrink-0">Person {i + 1}</span>
+                      <div key={i} className="flex flex-wrap items-center gap-2">
+                        <input value={names[i] ?? ""} maxLength={80} aria-label={`Name for person ${i + 1}`}
+                          placeholder={`Person ${i + 1} (optional name)`}
+                          onChange={(event) => setNames((prev) => prev.map((value, index) => index === i ? event.target.value : value))}
+                          className="w-full rounded-lg px-3 py-2 text-sm sm:w-36" />
                         <div className="relative flex-1">
                           <input
+                            aria-label={`Amount for person ${i + 1}`}
                             value={val}
                             onChange={(e) => updatePerson(i, e.target.value)}
                             placeholder="1.00 or 30%"
@@ -270,6 +295,7 @@ export function RequestModal({ onClose }: { onClose: () => void }) {
                           </span>
                         </div>
                         <button
+                          aria-label={`Remove person ${i + 1}`}
                           onClick={() => removePerson(i)}
                           disabled={people.length <= 2}
                           className="w-7 h-7 flex-shrink-0 flex items-center justify-center rounded-lg text-white-4 hover:text-white hover:bg-white/[0.06] transition-colors disabled:opacity-20"
@@ -281,7 +307,7 @@ export function RequestModal({ onClose }: { onClose: () => void }) {
                   })}
 
                   <div className="flex items-center justify-between pt-0.5">
-                    <button onClick={addPerson}
+                    <button onClick={addPerson} disabled={people.length >= 20}
                       className="flex items-center gap-1 text-[11px] text-white-4 hover:text-white transition-colors">
                       <PlusIcon size={11} weight="bold" /> Add person
                     </button>

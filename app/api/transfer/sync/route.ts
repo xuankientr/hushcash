@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthUser } from "@/lib/privy-server";
+import { reconcilePayment } from "@/lib/payment-links";
 import { prisma } from "@/lib/prisma";
 import { getTransactionDetails } from "@/lib/circle";
 
@@ -14,7 +15,6 @@ export async function POST(req: NextRequest) {
       status: "PENDING",
       circleTransferId: { not: null },
     },
-    select: { id: true, circleTransferId: true, senderId: true },
   });
 
   if (pending.length === 0) {
@@ -32,6 +32,7 @@ export async function POST(req: NextRequest) {
   await Promise.all(
     pending.map(async (t) => {
       try {
+        if (t.paymentKey) return await reconcilePayment(t);
         const details = await getTransactionDetails(t.circleTransferId!);
         if (details.state === "COMPLETE" || details.txHash) {
           await prisma.transfer.update({

@@ -5,13 +5,15 @@ import { transferUsdc } from "@/lib/circle";
 import { isValidAddress, isHandle, normalizeHandle } from "@/lib/utils";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { uploadToShelby } from "@/lib/shelby";
+import { positiveUsdc, startLinkedPayment } from "@/lib/payment-links";
 import { z } from "zod";
 
 const schema = z.object({
   to: z.string().min(1),
-  amountUsdc: z.string().regex(/^\d+(\.\d{1,6})?$/),
+  amountUsdc: z.string().refine(positiveUsdc),
   note: z.string().max(200).optional(),
-  requestCode: z.string().optional(),
+  requestCode: z.string().min(1).max(100).optional(),
+  invoiceCode: z.string().min(1).max(100).optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -27,7 +29,17 @@ export async function POST(req: NextRequest) {
   const parsed = schema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: "Invalid input" }, { status: 400 });
 
-  const { to, amountUsdc, note, requestCode } = parsed.data;
+  const { to, amountUsdc, note, requestCode, invoiceCode } = parsed.data;
+  const code = invoiceCode ?? requestCode;
+  if (code) {
+    if (invoiceCode && requestCode) return NextResponse.json({ error: "Specify one payment link" }, { status: 400 });
+    const result = await startLinkedPayment({
+      kind: invoiceCode ? "invoice" : "request", code, amountUsdc, payerId: user.id, payerWalletId: user.walletId,
+    });
+    return "error" in result
+      ? NextResponse.json({ error: result.error }, { status: result.status })
+      : NextResponse.json(result);
+  }
 
   let destinationAddress: string;
   let receiverId: string | undefined;
@@ -63,18 +75,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: msg }, { status: 400 });
   }
 
-  const [transfer] = await prisma.$transaction([
-    prisma.transfer.create({
-      data: {
-        senderId: user.id, receiverId, toAddress: destinationAddress,
-        amountUsdc, note, status: "PENDING", circleTransferId: circleTransfer?.id,
-      },
-    }),
-    ...(requestCode ? [prisma.paymentRequest.updateMany({
-      where: { code: requestCode, status: "ACTIVE" },
-      data: { status: "PAID" },
-    })] : []),
-  ]);
+  const transfer = await prisma.transfer.create({ data: {
+    senderId: user.id, receiverId, toAddress: destinationAddress, amountUsdc, note,
+    status: "PENDING", circleTransferId: circleTransfer?.id,
+  } });
 
   // Fire-and-forget: upload immutable receipt to Shelby
   void uploadToShelby(`hushcash/receipts/transfer-${transfer.id}.json`, {

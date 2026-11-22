@@ -1,8 +1,9 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { usePrivy } from "@privy-io/react-auth";
-import { PaperPlaneTiltIcon, CheckCircleIcon } from "@phosphor-icons/react";
+import { PaperPlaneTiltIcon } from "@phosphor-icons/react";
 import { formatUsdc } from "@/lib/utils";
 
 interface Props {
@@ -14,18 +15,9 @@ interface Props {
 export function InvoicePayWidget({ invoiceCode, amountUsdc, walletAddress }: Props) {
   const { ready, authenticated, login, getAccessToken } = usePrivy();
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const router = useRouter();
   const [error, setError] = useState("");
 
-  if (success) {
-    return (
-      <div className="rounded-3xl p-8 text-center" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
-        <CheckCircleIcon size={36} weight="duotone" className="text-green-400 mx-auto mb-3" />
-        <p className="text-sm font-bold text-white mb-1">Payment sent!</p>
-        <p className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>Invoice has been paid</p>
-      </div>
-    );
-  }
 
   if (ready && !authenticated) {
     return (
@@ -42,26 +34,29 @@ export function InvoicePayWidget({ invoiceCode, amountUsdc, walletAddress }: Pro
   async function handlePay() {
     if (!walletAddress) { setError("Recipient has no wallet set up yet"); return; }
     setError(""); setLoading(true);
-    const token = await getAccessToken();
-    const res = await fetch("/api/transfer", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      body: JSON.stringify({
-        to: walletAddress,
-        amountUsdc,
-        requestCode: invoiceCode,
-      }),
-    });
-    const data = await res.json();
-    setLoading(false);
-    if (!res.ok) { setError(data.error ?? "Payment failed"); return; }
+    try {
+      const token = await getAccessToken();
+      const res = await fetch("/api/transfer", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          to: walletAddress,
+          amountUsdc,
+          invoiceCode,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setError(data.error ?? "Payment failed"); return; }
 
-    // Mark invoice paid — fire-and-forget so success shows immediately
-    void fetch(`/api/invoice/${invoiceCode}/pay`, { method: "POST" });
-    setSuccess(true);
+      router.refresh();
+    } catch {
+      setError("Could not verify submission. Try again.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (

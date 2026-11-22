@@ -1,7 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { InvoicePayWidget } from "@/components/InvoicePayWidget";
-import { InvoiceStatusWatcher } from "@/components/InvoiceStatusWatcher";
+import Link from "next/link";
+import { RefreshPaymentStatus } from "@/components/PaymentActions";
+import { getLinkedPayment } from "@/lib/payment-links";
 import { formatUsdc } from "@/lib/utils";
 
 export default async function InvoicePage({ params }: { params: Promise<{ code: string }> }) {
@@ -13,7 +15,9 @@ export default async function InvoicePage({ params }: { params: Promise<{ code: 
 
   if (!invoice) notFound();
 
-  const isPaid = invoice.status === "PAID";
+  const payment = await getLinkedPayment("invoice", code);
+  const isPaid = !!payment?.confirmedAt || invoice.status === "PAID";
+  const isConfirming = !!payment?.circleTransferId && !payment.confirmedAt;
 
   return (
     <main className="min-h-screen flex items-start justify-center px-4 pt-12 pb-20" style={{ background: "#09090f" }}>
@@ -71,13 +75,13 @@ export default async function InvoicePage({ params }: { params: Promise<{ code: 
           {isPaid && (
             <div className="flex items-center gap-2 rounded-xl px-3 py-2" style={{ background: "rgba(52,211,153,0.1)", border: "1px solid rgba(52,211,153,0.2)" }}>
               <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
-              <p className="text-xs font-medium text-green-400">Paid {invoice.paidAt ? new Date(invoice.paidAt).toLocaleDateString() : ""}</p>
+              <p className="text-xs font-medium text-green-400">{payment?.confirmedAt ? "Paid" : "Previously marked paid"} {invoice.paidAt ? new Date(invoice.paidAt).toLocaleDateString() : ""}</p>
             </div>
           )}
         </div>
 
         {/* Pay widget */}
-        {!isPaid && (
+        {!isPaid && !isConfirming && invoice.status === "PENDING" && (
           <InvoicePayWidget
             invoiceCode={invoice.code}
             amountUsdc={invoice.amountUsdc}
@@ -85,8 +89,10 @@ export default async function InvoicePage({ params }: { params: Promise<{ code: 
           />
         )}
 
-        {/* Auto-redirect recipient when payment is received */}
-        {!isPaid && <InvoiceStatusWatcher invoiceCode={invoice.code} />}
+        {isConfirming && <p className="hush-card p-4 text-blue-200" role="status">Confirming payment on Arc…</p>}
+        {isConfirming && <RefreshPaymentStatus />}
+        {payment?.confirmedAt && <Link href={`/receipt/${payment.id}`} className="block text-blue-300 hover:underline">View payment receipt</Link>}
+        {invoice.status === "CANCELLED" && <p>This invoice was cancelled.</p>}
 
         <p className="text-center text-[11px]" style={{ color: "rgba(255,255,255,0.2)" }}>
           Powered by HushCash · Private payments on Arc

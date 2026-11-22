@@ -103,7 +103,7 @@ export default function DocsPage() {
             'Activity auto-syncs when you open Settings — pending transactions update in real time.',
             'Native USDC on Arc — fast finality, near-zero fees.',
             'Non-custodial wallets powered by Circle.',
-            'Drop Cash — claimable links backed by on-chain escrow.',
+            'Drop Cash — expiring claim links funded through Circle escrow wallets.',
             'On-chain privacy via Arc Privacy — coming soon.',
           ].map((item) => (
             <li key={item} className='flex items-start gap-2.5 text-sm text-white-3'>

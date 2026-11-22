@@ -23,7 +23,7 @@ const faqs = [
   },
   {
     q: 'What happens if a Drop Cash link is never claimed?',
-    a: "Funds remain locked in the escrow wallet. You can cancel the link from your dashboard to reclaim the funds.",
+    a: "After an unclaimed drop expires, open Drop Cash and select Return funds to my wallet. The refund shows as complete once Circle confirms the transfer.",
   },
   {
     q: 'What are contacts?',
