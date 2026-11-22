@@ -11,11 +11,16 @@ function checkUrl(key, expectedPort) {
   } catch {
     throw new Error(`${key}_INVALID_URI`);
   }
-  const shared = uri.hostname.endsWith(".pooler.supabase.com") && uri.username === `postgres.${ref}`;
-  const direct = uri.hostname === `db.${ref}.supabase.co`;
-  if (!["postgresql:", "postgres:"].includes(uri.protocol) || !(shared || direct) ||
-      uri.port !== expectedPort || uri.pathname !== "/postgres" || !uri.password) {
-    throw new Error(`${key}_WRONG_TARGET`);
+  if (!["postgresql:", "postgres:"].includes(uri.protocol)) throw new Error(`${key}_NOT_POSTGRES_URI`);
+  if (uri.hostname.endsWith(".pooler.supabase.com")) {
+    if (decodeURIComponent(uri.username) !== `postgres.${ref}`) throw new Error(`${key}_WRONG_PROJECT_REF`);
+  } else if (uri.hostname !== `db.${ref}.supabase.co`) {
+    throw new Error(`${key}_WRONG_SUPABASE_HOST`);
+  }
+  if ((uri.port || "5432") !== expectedPort) throw new Error(`${key}_WRONG_POOLER_PORT`);
+  if (uri.pathname !== "/postgres") throw new Error(`${key}_WRONG_DATABASE_NAME`);
+  if (!uri.password || /YOUR.DATABASE.PASSWORD|YOUR.PASSWORD|DB.PASSWORD/i.test(decodeURIComponent(uri.password))) {
+    throw new Error(`${key}_MISSING_DATABASE_PASSWORD`);
   }
   return uri.href;
 }
